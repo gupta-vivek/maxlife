@@ -13,7 +13,7 @@ from tensorflow.contrib import rnn
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile
-import numpy as np
+import sys
 
 
 trans_train_path = "../data/trans_train.csv"
@@ -22,12 +22,14 @@ trans_test_path = "../data/trans_test.csv"
 learning_rate = 0.001
 epochs = 50
 batch_size = 1000
-display_count = 1
+display_count = 1000
 split_ratio = [100, 0, 0]
 
 print("Reading the data...")
 trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID"])
 trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID"])
+
+print(trans_train_data[0])
 
 print("Train Data Size - ", len(trans_train_data))
 print("Test Data Size - ", len(trans_test_data))
@@ -181,16 +183,28 @@ with tf.device("/GPU:1"):
                     print("Test Iter Loss: ", l)
                     print("Test Iter Accuracy: ", acc)
 
+            print("---Prediction---")
+
+            train_x = divide_batches_gen(trans_train_data, batch_size)
+            test_x = divide_batches_gen(trans_test_data, batch_size)
+
             # Calculate decile.
             train_predictions = []
-            for train_data in trans_train_data:
-                model_prediction = sess.run(y_, feed_dict={x: [train_data]})
-                train_predictions.append(model_prediction[0])
+            for train_data in train_x:
+                model_prediction = sess.run(y_, feed_dict={x: train_data})
+                train_predictions.append(temp for temp in model_prediction)
+
+            print("Test")
 
             test_predictions = []
-            for test_data in trans_test_data:
-                model_prediction = sess.run(y_, feed_dict={x: [test_data]})
-                test_predictions.append(model_prediction[0])
+            for test_data in test_x:
+                model_prediction = sess.run(y_, feed_dict={x: test_data})
+                test_predictions.append(temp for temp in model_prediction)
+
+            print("---Decile---")
+
+            train_predictions = [item for sublist in train_predictions for item in sublist]
+            test_predictions = [item for sublist in test_predictions for item in sublist]
 
             train_decile_score = calculate_decile(train_predictions, list(trans_train_label))
             test_decile_score = calculate_decile(test_predictions, list(trans_test_label))
