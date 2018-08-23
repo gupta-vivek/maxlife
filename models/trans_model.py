@@ -21,7 +21,7 @@ trans_test_path = "../data/trans_test.csv"
 
 learning_rate = 0.001
 epochs = 50
-batch_size = 1000
+batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
 
