@@ -57,19 +57,29 @@ def model(x):
         reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=100)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
         trans_lstm = tf.nn.tanh(trans_lstm)
 
         trans_weights = {
-            'out': tf.random_normal([50, 1])
+            'w_h1': tf.random_normal([100, 50]),
+            'w_h2': tf.random_normal([50, 25]),
+            'w_out': tf.random_normal([25, 1])
         }
 
         trans_bias = {
-            'out': tf.random_normal([1])
+            'b_h1': tf.random_normal([50]),
+            'b_h2': tf.random_normal([25]),
+            'b_out': tf.random_normal([1])
         }
 
-        trans_output = tf.add(tf.matmul(trans_lstm[-1], trans_weights['out']), trans_bias['out'], name="trans_output")
+        h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
+        h1 = tf.nn.sigmoid(h1, name="trans_h1")
+
+        h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
+        h2 = tf.nn.sigmoid(h2, name="trans_h2")
+
+        trans_output = tf.add(tf.matmul(h2, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
 
     return trans_output
 
@@ -239,4 +249,4 @@ with tf.device("/GPU:1"):
             z_temp = sess.run(test_decile_summ, feed_dict={z: test_decile_score})
             writer.add_summary(z_temp, i)
 
-            model_saver.save(sess, '../maxlife_models/trans_model', global_step=i)
+            model_saver.save(sess, '../maxlife_models/trans_model_2', global_step=i)
