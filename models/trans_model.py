@@ -57,12 +57,12 @@ def model(x):
         reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=1)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
         trans_lstm = tf.nn.tanh(trans_lstm)
 
         trans_weights = {
-            'out': tf.random_normal([1, 1])
+            'out': tf.random_normal([50, 1])
         }
 
         trans_bias = {
