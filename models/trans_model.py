@@ -16,16 +16,18 @@ from utils.data_utils import calculate_decile
 import numpy as np
 
 
-trans_path = "../data/LSTM_ENCODED.csv"
+trans_train_path = "../data/trans_train.csv"
+trans_test_path = "../data/trans_test.csv"
 
 learning_rate = 0.001
-epochs = 10
-batch_size = 4
+epochs = 50
+batch_size = 1000
 display_count = 1
-split_ratio = [50,0,50]
+split_ratio = [100, 0, 0]
 
 print("Reading the data...")
-trans_train_data, trans_train_label, trans_valid_data, trans_valid_label, trans_test_data, trans_test_label = read_csv(trans_path, split_ratio=split_ratio)
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio)
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio)
 
 print("Train Data Size - ", len(trans_train_data))
 print("Test Data Size - ", len(trans_test_data))
@@ -110,7 +112,7 @@ test_decile_summ = tf.summary.scalar("test_decile", z)
 
 summary_merged = tf.summary.merge_all()
 
-logdir = "tensorboard_model/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+logdir = "../tensorboard_model/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 init = tf.global_variables_initializer()
 
@@ -223,4 +225,4 @@ with tf.device("/GPU:1"):
             z_temp = sess.run(test_decile_summ, feed_dict={z: test_decile_score})
             writer.add_summary(z_temp, i)
 
-            model_saver.save(sess, 'maxlife_models/trans_model', global_step=i)
+            model_saver.save(sess, '../maxlife_models/trans_model', global_step=i)
