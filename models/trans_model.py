@@ -7,14 +7,14 @@ Description:
 
 ..todo::
 """
+import sys
+sys.path.append('/home/vivek.gupta/maxlife')
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile
-import sys
-
 
 trans_train_path = "../data/trans_train.csv"
 trans_test_path = "../data/trans_test.csv"
