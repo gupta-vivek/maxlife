@@ -36,10 +36,10 @@ print("Test Data Size - ", len(trans_test_data))
 
 print("Splitting the data...")
 
-# train_x = divide_batches_gen(trans_train_data, batch_size)
+train_x = divide_batches(trans_train_data, batch_size)
 train_y = divide_batches(trans_train_label, batch_size)
 
-# test_x = divide_batches_gen(trans_test_data, batch_size)
+test_x = divide_batches(trans_test_data, batch_size)
 test_y = divide_batches(trans_test_label, batch_size)
 
 train_batch_size = len(train_y)
@@ -64,13 +64,16 @@ def model(x):
         trans_weights = {
             # 'w_h1': tf.random_normal([100, 50]),
             # 'w_h2': tf.random_normal([50, 25]),
-            'w_out': tf.random_normal([24, 1])
+            'w_fc': tf.random_normal([24, 10]),
+            'w_out': tf.random_normal([10, 1])
         }
 
         trans_bias = {
             # 'b_h1': tf.random_normal([50]),
             # 'b_h2': tf.random_normal([25]),
+            'b_fc': tf.random_normal([10]),
             'b_out': tf.random_normal([1])
+
         }
         #
         # h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
@@ -80,7 +83,8 @@ def model(x):
         # h2 = tf.nn.sigmoid(h2, name="trans_h2")
 
         # trans_output = tf.add(tf.matmul(h2, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
-        trans_output = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
+        fully_connected = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_fc']), trans_bias['b_fc'], name="fully_connected")
+        trans_output = tf.add(tf.matmul(fully_connected, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
 
     return trans_output
 

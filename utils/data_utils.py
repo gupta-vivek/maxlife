@@ -12,6 +12,7 @@ import pandas as pd
 from collections import OrderedDict
 from scipy.special import expit
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.utils import shuffle
 
 
 def sigmoid(z):
@@ -97,8 +98,8 @@ def calculate_decile(predictions, labels):
 
 def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     trans_df = pd.read_csv(trans_path)
-    trans_df_Y = trans_df['Lapse_Flag']
-    trans_df_X = trans_df.drop(['Lapse_Flag'], axis=1)
+    trans_df_Y = trans_df['TARGET']
+    trans_df_X = trans_df.drop(['TARGET'], axis=1)
 
     train_ratio = float(train_ratio)
     test_ratio = float(test_ratio)
@@ -120,14 +121,47 @@ def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     print("Train")
     print("Transaction")
     train_df = trans_df.reindex(train_index)
-    train_df.to_csv(output_dir + "trans_train.csv", index=False)
+    train_df.to_csv(output_dir + "trans_old_train.csv", index=False)
     print(train_df.head())
 
     print("Test")
     print("Transaction")
     test_df = trans_df.reindex(test_index)
-    test_df.to_csv(output_dir + "trans_test.csv", index=False)
+    test_df.to_csv(output_dir + "trans_old_test.csv", index=False)
     print(test_df.head())
 
 
-stratified_generator("/users/Vivek/transaction.csv", 0.5, 0.5, "/users/Vivek/")
+def data_generator(data_path, ratio_ones=0.3, ratio_zeroes=0.7, length=2100000, output_dir=None, test=True):
+    length = int(length)
+    ratio_zeroes = float(ratio_zeroes)
+    ratio_ones = float(ratio_ones)
+
+    df = pd.read_csv(data_path)
+    print(len(df))
+    one_df = df.loc[df['Lapse_Flag'] == 1.]
+    one_df = shuffle(one_df)
+    zero_df = df.loc[df['Lapse_Flag'] == 0.]
+    zero_df = shuffle(zero_df)
+
+    count_one = int(ratio_ones * length)
+    count_zero = int(ratio_zeroes * length)
+    new_one_df = one_df[:count_one]
+    new_one_df_test = one_df[count_one:]
+    new_zero_df = zero_df[:count_zero]
+    new_zero_df_test = zero_df[count_zero:]
+
+    new_df = pd.concat([new_one_df, new_zero_df])
+    # new_df = new_df.drop(['POL_ID'], axis=1)
+    new_df = shuffle(new_df)
+    new_df.to_csv(output_dir + "/trans2_train.csv", index=False)
+
+    if test:
+        new_df_test = pd.concat([new_one_df_test, new_zero_df_test])
+        # new_df_test = new_df_test.drop(['POL_ID'], axis=1)
+        new_df_test['Lapse_Flag'] = new_df_test['Lapse_Flag']
+        new_df_test = shuffle(new_df_test)
+        new_df_test.to_csv(output_dir + "/trans2_test.csv", index=False)
+
+
+# data_generator("/Users/vivek/transaction.csv", output_dir="/Users/vivek/")
+stratified_generator("/Users/vivek/Downloads/new_score_lstm_complete_data.csv", train_ratio=0.5, test_ratio=0.5, output_dir="/Users/vivek/")
