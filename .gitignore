@@ -1,3 +1,5 @@
 .idea/
 data/
 *pycache*
+maxlife_models/
+tensorboard_model/

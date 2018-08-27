@@ -98,8 +98,8 @@ def calculate_decile(predictions, labels):
 
 def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     trans_df = pd.read_csv(trans_path)
-    trans_df_Y = trans_df['TARGET']
-    trans_df_X = trans_df.drop(['TARGET'], axis=1)
+    trans_df_Y = trans_df[['Lapse_Flag', 'MODE_OF_PAYMENT']]
+    trans_df_X = trans_df.drop(['Lapse_Flag', 'MODE_OF_PAYMENT'], axis=1)
 
     train_ratio = float(train_ratio)
     test_ratio = float(test_ratio)
@@ -121,13 +121,13 @@ def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     print("Train")
     print("Transaction")
     train_df = trans_df.reindex(train_index)
-    train_df.to_csv(output_dir + "trans_old_train.csv", index=False)
+    train_df.to_csv(output_dir + "trans_new_train.csv", index=False)
     print(train_df.head())
 
     print("Test")
     print("Transaction")
     test_df = trans_df.reindex(test_index)
-    test_df.to_csv(output_dir + "trans_old_test.csv", index=False)
+    test_df.to_csv(output_dir + "trans_new_test.csv", index=False)
     print(test_df.head())
 
 
@@ -164,4 +164,4 @@ def data_generator(data_path, ratio_ones=0.3, ratio_zeroes=0.7, length=2100000, 
 
 
 # data_generator("/Users/vivek/transaction.csv", output_dir="/Users/vivek/")
-stratified_generator("/Users/vivek/Downloads/new_score_lstm_complete_data.csv", train_ratio=0.5, test_ratio=0.5, output_dir="/Users/vivek/")
+# stratified_generator("/Users/vivek/new_trans2.csv", train_ratio=0.5, test_ratio=0.5, output_dir="/Users/vivek/")
