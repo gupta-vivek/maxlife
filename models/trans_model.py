@@ -16,8 +16,8 @@ from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile
 
-trans_train_path = "../data/trans_train.csv"
-trans_test_path = "../data/trans_test.csv"
+trans_train_path = "../data/trans_new_train.csv"
+trans_test_path = "../data/trans_new_test.csv"
 
 learning_rate = 0.001
 epochs = 50
@@ -26,8 +26,8 @@ display_count = 1000
 split_ratio = [100, 0, 0]
 
 print("Reading the data...")
-trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID"])
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID"])
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
 
 print(trans_train_data[0])
 
@@ -57,29 +57,29 @@ def model(x):
         reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=100)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
-        trans_lstm = tf.nn.tanh(trans_lstm)
+        # trans_lstm = tf.nn.tanh(trans_lstm)
 
         trans_weights = {
-            'w_h1': tf.random_normal([100, 50]),
-            'w_h2': tf.random_normal([50, 25]),
-            'w_out': tf.random_normal([25, 1])
+            # 'w_h1': tf.random_normal([100, 50]),
+            # 'w_h2': tf.random_normal([50, 25]),
+            'w_out': tf.get_variable(name="w_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         trans_bias = {
-            'b_h1': tf.random_normal([50]),
-            'b_h2': tf.random_normal([25]),
-            'b_out': tf.random_normal([1])
+            # 'b_h1': tf.random_normal([50]),
+            # 'b_h2': tf.random_normal([25]),
+            'b_out':  tf.get_variable(name="b_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
-        h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
-        h1 = tf.nn.sigmoid(h1, name="trans_h1")
+        # h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
+        # h1 = tf.nn.sigmoid(h1, name="trans_h1")
 
-        h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
-        h2 = tf.nn.sigmoid(h2, name="trans_h2")
+        # h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
+        # h2 = tf.nn.sigmoid(h2, name="trans_h2")
 
-        trans_output = tf.add(tf.matmul(h2, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
+        trans_output = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
 
     return trans_output
 
