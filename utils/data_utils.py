@@ -28,6 +28,8 @@ def calculate_gini_score_manual(y_true, y_pred):
     :param y_pred: Predicted Label
     :return: Gini Score
     """
+
+    y_true = sigmoid(y_true)
     assert y_true.shape == y_pred.shape
     n_samples = y_true.shape[0]
     arr = np.array([y_true, y_pred]).transpose()
