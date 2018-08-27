@@ -16,18 +16,23 @@ from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile
 
-trans_train_path = "../data/trans_old_train.csv"
-trans_test_path = "../data/trans_old_test.csv"
+trans_train_path = "/Users/vivek/Downloads/new_score_lstm_complete_data.csv"
+# trans_train_path = "../data/trans_old_train.csv"
+trans_test_path = "/Users/vivek/Downloads/new_score_lstm_complete_data.csv"
+# trans_test_path = "../data/trans_old_test.csv"
 
 learning_rate = 0.001
-epochs = 50
-batch_size = 512
+epochs = 10
+batch_size = 1000
 display_count = 1000
 split_ratio = [100, 0, 0]
 
 print("Reading the data...")
 trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, output_label="TARGET", split_ratio=split_ratio, header=True, ignore_cols=["POL_ID_MASKED","TARGET_DUE"])
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, output_label="TARGET", split_ratio=split_ratio, header=True, ignore_cols=["POL_ID_MASKED", "TARGET_DUE"])
+# trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, output_label="TARGET", split_ratio=split_ratio, header=True, ignore_cols=["POL_ID_MASKED", "TARGET_DUE"])
+
+trans_test_data = trans_train_data
+trans_test_label = trans_train_label
 
 print(trans_train_data[0])
 
@@ -57,22 +62,23 @@ def model(x):
         reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=24)
-        trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
-        trans_lstm = tf.nn.tanh(trans_lstm)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=24, activation=tf.tanh)
+        cells = tf.nn.rnn_cell.MultiRNNCell([lstm_cell])
+        outputs, states = tf.nn.static_rnn(cells, unstack_trans_data, dtype=tf.float32)
+        # trans_lstm = tf.nn.tanh(outputs[-1])
 
         trans_weights = {
             # 'w_h1': tf.random_normal([100, 50]),
             # 'w_h2': tf.random_normal([50, 25]),
-            'w_fc': tf.random_normal([24, 10]),
-            'w_out': tf.random_normal([10, 1])
+            # 'w_fc': tf.random_normal([24, 10]),
+            'w_out': tf.random_uniform([24, 1])
         }
 
         trans_bias = {
             # 'b_h1': tf.random_normal([50]),
             # 'b_h2': tf.random_normal([25]),
-            'b_fc': tf.random_normal([10]),
-            'b_out': tf.random_normal([1])
+            # 'b_fc': tf.random_normal([10]),
+            'b_out': tf.random_uniform([1])
 
         }
         #
@@ -83,8 +89,8 @@ def model(x):
         # h2 = tf.nn.sigmoid(h2, name="trans_h2")
 
         # trans_output = tf.add(tf.matmul(h2, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
-        fully_connected = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_fc']), trans_bias['b_fc'], name="fully_connected")
-        trans_output = tf.add(tf.matmul(fully_connected, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
+        # fully_connected = tf.add(tf.matmul(trans_lstm, trans_weights['w_fc']), trans_bias['b_fc'], name="fully_connected")
+        trans_output = tf.add(tf.matmul(outputs[-1], trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
 
     return trans_output
 
