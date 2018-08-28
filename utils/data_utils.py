@@ -29,7 +29,7 @@ def calculate_gini_score_manual(y_true, y_pred):
     :return: Gini Score
     """
 
-    y_true = sigmoid(y_true)
+    y_pred = sigmoid(y_pred)
     assert y_true.shape == y_pred.shape
     n_samples = y_true.shape[0]
     arr = np.array([y_true, y_pred]).transpose()
