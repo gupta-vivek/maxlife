@@ -7,6 +7,9 @@ Description:
 
 ..todo::
 """
+import sys
+sys.path.append('/home/vivek.gupta/maxlife')
+
 import tensorflow as tf
 import datetime
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
@@ -15,9 +18,11 @@ import numpy as np
 import os
 
 # trans_train_path = "../data/trans_new_train.csv"
-trans_train_path = "/Users/vivek/sample.csv"
+trans_train_path = sys.argv[1]
 # trans_test_path = "../data/trans_new_test.csv"
-trans_test_path = "/Users/vivek/sample.csv"
+trans_test_path = sys.argv[2]
+
+model_name = sys.argv[3]
 
 learning_rate = 0.001
 epochs = 10
@@ -54,7 +59,7 @@ if not os.path.isdir(saved_model_dir):
 
 
 with tf.Session() as sess:
-    saved_model = saved_model_dir + 'trans_model/'
+    saved_model = saved_model_dir + model_name
     ckpt = tf.train.latest_checkpoint(saved_model)
     filename = ".".join([ckpt, 'meta'])
     previous_count = int(filename.split('-')[1].split('.')[0])
@@ -196,4 +201,4 @@ with tf.Session() as sess:
         z_temp = sess.run(test_gini_summ, feed_dict={z: test_gini})
         writer.add_summary(z_temp, i)
 
-        model_saver.save(sess, '../maxlife_models/trans_model/trans_model_1', global_step=i)
+        model_saver.save(sess, '../maxlife_models/' + model_name + '/trans_model', global_step=i)

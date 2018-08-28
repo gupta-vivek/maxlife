@@ -7,15 +7,18 @@ Description:
 
 ..todo::
 """
+import sys
+sys.path.append('/home/vivek.gupta/maxlife')
 
 import tensorflow as tf
-import datetime
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 from utils.data_utils import calculate_decile, calculate_gini_score_manual
 import numpy as np
 import os
 
-infer_path = "/Users/vivek/sample.csv"
+# infer_path = "/Users/vivek/sample.csv"
+infer_path = sys.argv[1]
+model_name = sys.argv[2]
 
 batch_size = 512
 display_count = 1000
