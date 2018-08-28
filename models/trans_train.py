@@ -27,7 +27,7 @@ model_name = sys.argv[3]
 # model_name = "trans_lstm_50251"
 
 learning_rate = 0.001
-epochs = 10
+epochs = 100
 batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
