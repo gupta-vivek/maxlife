@@ -217,8 +217,8 @@ with tf.device("/GPU:1"):
             test_predictions = np.asarray(test_predictions)
             test_predictions = test_predictions.reshape(test_predictions.shape[0],)
 
-            train_gini = calculate_gini_score_manual(np.asarray(train_predictions), trans_train_label)
-            test_gini = calculate_gini_score_manual(np.asarray(train_predictions), trans_train_label)
+            train_gini = calculate_gini_score_manual(trans_train_label, np.asarray(train_predictions))
+            test_gini = calculate_gini_score_manual(trans_test_label, np.asarray(test_predictions))
 
             print("\n\nEpoch:  ", i)
             print("Loss")
