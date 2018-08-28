@@ -44,7 +44,7 @@ if not os.path.isdir(saved_model_dir):
 
 with tf.device("/GPU:0"):
     with tf.Session() as sess:
-        saved_model = saved_model_dir + 'trans_model/'
+        saved_model = saved_model_dir + model_name
         ckpt = tf.train.latest_checkpoint(saved_model)
         filename = ".".join([ckpt, 'meta'])
         previous_count = int(filename.split('-')[1].split('.')[0])
