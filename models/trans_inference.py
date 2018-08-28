@@ -12,13 +12,15 @@ sys.path.append('/home/vivek.gupta/maxlife')
 
 import tensorflow as tf
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
-from utils.data_utils import calculate_decile, calculate_gini_score_manual
+from utils.data_utils import calculate_decile, calculate_gini_score_manual, sigmoid
 import numpy as np
 import os
+import pandas as pd
 
 # infer_path = "/Users/vivek/sample.csv"
 infer_path = sys.argv[1]
 model_name = sys.argv[2]
+output_file = sys.argv[3]
 
 batch_size = 512
 display_count = 1000
@@ -96,3 +98,10 @@ with tf.device("/GPU:0"):
         print("Decile: ", infer_decile_score)
         print("Gini: ", infer_gini)
         print("\n\n")
+
+        df = pd.DataFrame
+        df['Predictions'] = infer_predictions
+        df['Sigmoid_Output'] = sigmoid(infer_predictions)
+        df['Label'] = inference_label
+
+        df.to_csv(output_file, index=False)
