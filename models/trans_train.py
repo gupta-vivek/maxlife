@@ -133,7 +133,7 @@ init = tf.global_variables_initializer()
 # Model saver
 model_saver = tf.train.Saver()
 
-with tf.device("/GPU:1"):
+with tf.device("/GPU:0"):
     with tf.Session() as sess:
         sess.run(init)
 
