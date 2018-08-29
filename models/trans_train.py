@@ -18,13 +18,13 @@ from utils.data_utils import calculate_decile, calculate_gini_score_manual
 import numpy as np
 import os
 
-trans_train_path = sys.argv[1]
-# trans_train_path = "/Users/vivek/sample.csv"
-trans_test_path = sys.argv[2]
-# trans_test_path = "/Users/vivek/sample.csv"
+# trans_train_path = sys.argv[1]
+trans_train_path = "/Users/vivek/sample.csv"
+# trans_test_path = sys.argv[2]
+trans_test_path = "/Users/vivek/sample.csv"
 
-model_name = sys.argv[3]
-# model_name = "trans_lstm_50251"
+# model_name = sys.argv[3]
+model_name = "trans_lstm_50251"
 
 learning_rate = 0.001
 epochs = 100
@@ -33,8 +33,8 @@ display_count = 1000
 split_ratio = [100, 0, 0]
 
 print("Reading the data...")
-trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
 
 print(trans_train_data[0])
 print(trans_train_label[0])
@@ -161,13 +161,13 @@ with tf.device("/GPU:0"):
                 train_count += 1
                 count += 1
 
-                _, l = sess.run([optimizer, loss], feed_dict={x: train_data, y: train_label})
+                _, l = sess.run([optimizer, loss], feed_dict={x: train_data, y: train_label, lr: learning_rate})
 
                 train_loss += l
 
                 if count % display_count == 0:
                     train_summary = sess.run(train_loss_summ,
-                                                     feed_dict={x: train_data, y: train_label, lr: learning_rate})
+                                                     feed_dict={x: train_data, y: train_label})
                     writer.add_summary(train_summary, train_count)
                     print("Train Batch Count: ", count)
                     print("Train Iter Loss: ", l)
