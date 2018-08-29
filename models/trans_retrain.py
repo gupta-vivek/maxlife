@@ -57,14 +57,17 @@ saved_model_dir ="../maxlife_models/"
 if not os.path.isdir(saved_model_dir):
     os.mkdir(saved_model_dir)
 
+saved_model = saved_model_dir + model_name
+ckpt = tf.train.latest_checkpoint(saved_model)
+filename = ".".join([ckpt, 'meta'])
+model_saver = tf.train.import_meta_graph(filename)
+
+
 with tf.device("/GPU:0"):
     with tf.Session() as sess:
-        saved_model = saved_model_dir + model_name
-        ckpt = tf.train.latest_checkpoint(saved_model)
-        filename = ".".join([ckpt, 'meta'])
-        previous_count = int(filename.split('-')[1].split('.')[0])
-        model_saver = tf.train.import_meta_graph(filename)
+
         model_saver.restore(sess, ckpt)
+        previous_count = int(filename.split('-')[1].split('.')[0])
 
         writer = tf.summary.FileWriter(logdir, sess.graph)
         writer.add_graph(sess.graph)

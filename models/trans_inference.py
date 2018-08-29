@@ -50,7 +50,6 @@ model_saver = tf.train.import_meta_graph(filename, clear_devices=True)
 
 with tf.device("/GPU:0"):
     with tf.Session() as sess:
-        previous_count = int(filename.split('-')[1].split('.')[0])
         model_saver.restore(sess, ckpt)
 
         graph = tf.get_default_graph()
