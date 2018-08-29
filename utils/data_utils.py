@@ -13,10 +13,24 @@ from collections import OrderedDict
 from scipy.special import expit
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.utils import shuffle
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import confusion_matrix
 
 
 def sigmoid(z):
     return expit(z)
+
+
+def calculate_precision_recall_curve(y_true, y_pred):
+    y_pred = sigmoid(y_pred)
+    precision, recall, thresholds = precision_recall_curve(y_true, y_pred)
+    return precision[0], recall[0], thresholds[0]
+
+
+def calculate_confusion_matrix(y_true, y_pred, threshold):
+    y_pred[np.where(y_pred >= threshold)] = 1.0
+    y_pred[np.where(y_pred < threshold)] = 0.0
+    return confusion_matrix(y_true, y_pred)
 
 
 def calculate_gini_score_manual(y_true, y_pred):
