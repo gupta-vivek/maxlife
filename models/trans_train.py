@@ -39,6 +39,8 @@ trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_
 print(trans_train_data[0])
 print(trans_train_label[0])
 
+pos_weight = len(trans_train_label)/sum(trans_train_label)
+
 print("Train Data Size - ", len(trans_train_data))
 print("Test Data Size - ", len(trans_test_data))
 
@@ -58,6 +60,7 @@ with tf.name_scope("placeholders"):
     x = tf.placeholder(dtype=tf.float32, shape=[None, 24], name="input")
     y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name="output")
     z = tf.placeholder(dtype=tf.float32, shape=[], name="z")
+    lr = tf.placeholder(dtype=tf.float32, shape=[], name="lr")
 
 
 # Model.
@@ -98,12 +101,12 @@ tf.add_to_collection("y_", y_)
 
 # Loss.
 with tf.name_scope("loss"):
-    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_, labels=y))
+    loss = tf.reduce_mean(tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(logits=y_, targets=y, pos_weight=pos_weight)))
     tf.add_to_collection("loss", loss)
 
 # Optimizer.
 with tf.name_scope("optimizer"):
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
+    optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
     tf.add_to_collection("optimizer", optimizer)
 
 # Create summary for loss.
@@ -164,7 +167,7 @@ with tf.device("/GPU:0"):
 
                 if count % display_count == 0:
                     train_summary = sess.run(train_loss_summ,
-                                                     feed_dict={x: train_data, y: train_label})
+                                                     feed_dict={x: train_data, y: train_label, lr: learning_rate})
                     writer.add_summary(train_summary, train_count)
                     print("Train Batch Count: ", count)
                     print("Train Iter Loss: ", l)
