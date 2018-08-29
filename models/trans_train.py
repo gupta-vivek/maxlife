@@ -18,13 +18,13 @@ from utils.data_utils import calculate_decile, calculate_gini_score_manual
 import numpy as np
 import os
 
-# trans_train_path = sys.argv[1]
-trans_train_path = "/Users/vivek/sample.csv"
-# trans_test_path = sys.argv[2]
-trans_test_path = "/Users/vivek/sample.csv"
+trans_train_path = sys.argv[1]
+# trans_train_path = "/Users/vivek/sample.csv"
+trans_test_path = sys.argv[2]
+# trans_test_path = "/Users/vivek/sample.csv"
 
-# model_name = sys.argv[3]
-model_name = "trans_lstm_50251"
+model_name = sys.argv[3]
+# model_name = "trans_lstm_50251"
 
 learning_rate = 0.001
 epochs = 100
