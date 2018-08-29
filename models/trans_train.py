@@ -34,8 +34,8 @@ split_ratio = [100, 0, 0]
 keep_probability = 0.5
 
 print("Reading the data...")
-trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "MODE_OF_PAYMENT", "MI"], output_label="Lapse_Flag")
 
 print(trans_train_data[0])
 print(trans_train_label[0])
@@ -170,7 +170,7 @@ with tf.device("/GPU:0"):
 
                 if count % display_count == 0:
                     train_summary = sess.run(train_loss_summ,
-                                                     feed_dict={x: train_data, y: train_label})
+                                                     feed_dict={x: train_data, y: train_label, kp: keep_probability})
                     writer.add_summary(train_summary, train_count)
                     print("Train Batch Count: ", count)
                     print("Train Iter Loss: ", l)
@@ -190,7 +190,7 @@ with tf.device("/GPU:0"):
                 test_loss += l
 
                 if count % display_count == 0:
-                    test_summary = sess.run(test_loss_summ, feed_dict={x: test_data, y: test_label})
+                    test_summary = sess.run(test_loss_summ, feed_dict={x: test_data, y: test_label, kp: keep_probability})
                     writer.add_summary(test_summary, test_count)
                     print("Test Batch Count: ", count)
                     print("Test Iter Loss: ", l)
