@@ -42,13 +42,15 @@ saved_model_dir ="../maxlife_models/"
 if not os.path.isdir(saved_model_dir):
     os.mkdir(saved_model_dir)
 
+
+saved_model = saved_model_dir + model_name
+ckpt = tf.train.latest_checkpoint(saved_model)
+filename = ".".join([ckpt, 'meta'])
+model_saver = tf.train.import_meta_graph(filename, clear_devices=True)
+
 with tf.device("/GPU:0"):
     with tf.Session() as sess:
-        saved_model = saved_model_dir + model_name
-        ckpt = tf.train.latest_checkpoint(saved_model)
-        filename = ".".join([ckpt, 'meta'])
         previous_count = int(filename.split('-')[1].split('.')[0])
-        model_saver = tf.train.import_meta_graph(filename)
         model_saver.restore(sess, ckpt)
 
         graph = tf.get_default_graph()
@@ -91,7 +93,7 @@ with tf.device("/GPU:0"):
         infer_predictions = np.asarray(infer_predictions)
         infer_predictions = infer_predictions.reshape(infer_predictions.shape[0], )
 
-        infer_gini = calculate_gini_score_manual(np.asarray(infer_predictions), inference_label)
+        infer_gini = calculate_gini_score_manual(inference_label, np.asarray(infer_predictions))
 
         print("Inference")
         print("Loss: ", infer_loss / infer_batch_size)
@@ -99,7 +101,7 @@ with tf.device("/GPU:0"):
         print("Gini: ", infer_gini)
         print("\n\n")
 
-        df = pd.DataFrame
+        df = pd.DataFrame()
         df['Predictions'] = infer_predictions
         df['Sigmoid_Output'] = sigmoid(infer_predictions)
         df['Label'] = inference_label
