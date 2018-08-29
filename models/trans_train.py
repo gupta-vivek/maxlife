@@ -18,19 +18,20 @@ from utils.data_utils import calculate_decile, calculate_gini_score_manual
 import numpy as np
 import os
 
-trans_train_path = sys.argv[1]
-# trans_train_path = "/Users/vivek/sample.csv"
-trans_test_path = sys.argv[2]
-# trans_test_path = "/Users/vivek/sample.csv"
+# trans_train_path = sys.argv[1]
+trans_train_path = "/Users/vivek/sample.csv"
+# trans_test_path = sys.argv[2]
+trans_test_path = "/Users/vivek/sample.csv"
 
-model_name = sys.argv[3]
-# model_name = "trans_lstm_50251"
+# model_name = sys.argv[3]
+model_name = "trans_lstm_50251"
 
 learning_rate = 0.001
 epochs = 100
 batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
+keep_probability = 0.5
 
 print("Reading the data...")
 trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
@@ -61,41 +62,43 @@ with tf.name_scope("placeholders"):
     y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name="output")
     z = tf.placeholder(dtype=tf.float32, shape=[], name="z")
     lr = tf.placeholder(dtype=tf.float32, shape=[], name="lr")
+    kp = tf.placeholder(dtype=tf.float32, shape=[], name="kp")
 
 
 # Model.
-def model(x):
+def model(x, kp):
     with tf.name_scope("transaction"):
         reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=100, activation=tf.nn.relu)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
 
         trans_weights = {
-            'w_h1': tf.get_variable(name="w_h1", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_out': tf.get_variable(name="w_out", shape=[25, 1], initializer=tf.contrib.layers.xavier_initializer())
+            'w_h1': tf.get_variable(name="w_h1", shape=[50, 50], initializer=tf.contrib.layers.xavier_initializer()),
+            # 'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_out': tf.get_variable(name="w_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         trans_bias = {
             'b_h1':  tf.get_variable(name="b_h1", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
+            # 'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
             'b_out':  tf.get_variable(name="b_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
         h1 = tf.nn.sigmoid(h1, name="trans_h1")
+        h1 = tf.nn.dropout(h1, keep_prob=kp)
 
-        h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
-        h2 = tf.nn.sigmoid(h2, name="trans_h2")
+        # h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
+        # h2 = tf.nn.sigmoid(h2, name="trans_h2")
 
-        trans_output = tf.add(tf.matmul(h2, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
+        trans_output = tf.add(tf.matmul(h1, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
 
     return trans_output
 
 
-y_ = model(x)
+y_ = model(x, kp)
 tf.add_to_collection("y_", y_)
 
 
@@ -161,7 +164,7 @@ with tf.device("/GPU:0"):
                 train_count += 1
                 count += 1
 
-                _, l = sess.run([optimizer, loss], feed_dict={x: train_data, y: train_label, lr: learning_rate})
+                _, l = sess.run([optimizer, loss], feed_dict={x: train_data, y: train_label, lr: learning_rate, kp: keep_probability})
 
                 train_loss += l
 
@@ -182,7 +185,7 @@ with tf.device("/GPU:0"):
                 count += 1
                 test_count += 1
 
-                l = sess.run(loss, feed_dict={x: test_data, y: test_label})
+                l = sess.run(loss, feed_dict={x: test_data, y: test_label, kp: keep_probability})
 
                 test_loss += l
 
@@ -198,12 +201,12 @@ with tf.device("/GPU:0"):
             # Calculate decile.
             train_predictions = []
             for train_data in train_x:
-                model_prediction = sess.run(y_, feed_dict={x: train_data})
+                model_prediction = sess.run(y_, feed_dict={x: train_data, kp: 1.0})
                 train_predictions.append(temp for temp in model_prediction)
 
             test_predictions = []
             for test_data in test_x:
-                model_prediction = sess.run(y_, feed_dict={x: test_data})
+                model_prediction = sess.run(y_, feed_dict={x: test_data, kp: 1.0})
                 test_predictions.append(temp for temp in model_prediction)
 
             train_predictions = [item for sublist in train_predictions for item in sublist]
