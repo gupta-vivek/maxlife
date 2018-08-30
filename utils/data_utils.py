@@ -147,6 +147,61 @@ def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     print(test_df.head())
 
 
+def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_dir):
+    trans_df = pd.read_csv(trans_path)
+    trans_df_Y = trans_df[['Lapse_Flag', 'TB_POL_BILL_MODE_CD']]
+    trans_df_X = trans_df.drop(['Lapse_Flag', 'TB_POL_BILL_MODE_CD'], axis=1)
+
+    ffn_df = pd.read_csv(ffn_path)
+
+    train_ratio = float(train_ratio)
+    test_ratio = float(test_ratio)
+
+    print("Stratified split...")
+
+    sss = StratifiedShuffleSplit(n_splits=1, train_size=train_ratio, test_size=test_ratio)
+
+    # trans_df['Lapse_Flag'] = trans_df['Lapse_Flag']
+    # trans_df = trans_df.drop(['Lapse_Flag'], axis=1)
+
+    train_index = None
+    test_index = None
+
+    for train_ind, test_ind in sss.split(trans_df_X, trans_df_Y):
+        train_index = train_ind
+        test_index = test_ind
+
+    print("Train")
+    print("Transaction")
+    # train_df = trans_df.reindex(train_index)
+
+    idx = np.random.permutation(train_index)
+    train_trans_df = trans_df.reindex(idx)
+    train_ffn_df = ffn_df.reindex(idx)
+
+    train_trans_df.to_csv(output_dir + "final_trans_train.csv", index=False)
+    print(train_trans_df.head())
+
+    print("FFN")
+    train_ffn_df.to_csv(output_dir + "final_ffn_train.csv", index=False)
+    print(train_ffn_df.head())
+
+    print("Test")
+    print("Transaction")
+    # test_df = trans_df.reindex(test_index)
+
+    idx = np.random.permutation(test_index)
+    test_trans_df = trans_df.reindex(idx)
+    test_ffn_df = ffn_df.reindex(idx)
+
+    test_trans_df.to_csv(output_dir + "final_trans_test.csv", index=False)
+    print(test_trans_df.head())
+
+    print("FFN")
+    test_ffn_df.to_csv(output_dir + "final_ffn_test.csv", index=False)
+    print(test_ffn_df.head())
+
+
 def data_generator(data_path, ratio_ones=0.3, ratio_zeroes=0.7, length=2100000, output_dir=None, test=True):
     length = int(length)
     ratio_zeroes = float(ratio_zeroes)
