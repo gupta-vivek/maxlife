@@ -85,23 +85,20 @@ def model(x_ffn, x_lstm, kp):
         reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=24, activation=tf.nn.relu)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
 
-        # trans_weights = {
-        #     'w_h1': tf.get_variable(name="lw_h1", shape=[50, 50], initializer=tf.contrib.layers.xavier_initializer()),
-        #     # 'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
-        #     'w_out': tf.get_variable(name="lw_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
-        # }
-        #
-        # trans_bias = {
-        #     'b_h1': tf.get_variable(name="lb_h1", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
-        #     # 'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
-        #     'b_out': tf.get_variable(name="lb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
-        # }
-        #
-        # h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
-        # h1 = tf.nn.sigmoid(h1, name="trans_h1")
+        trans_weights = {
+            'w_h1': tf.get_variable(name="lw_h1", shape=[24, 10], initializer=tf.contrib.layers.xavier_initializer())
+        }
+
+        trans_bias = {
+            'b_h1': tf.get_variable(name="lb_h1", shape=[10], initializer=tf.contrib.layers.xavier_initializer())
+
+        }
+
+        h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
+        h1_sig = tf.nn.sigmoid(h1, name="trans_h1")
         # h1 = tf.nn.dropout(h1, keep_prob=kp)
 
         # h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
@@ -111,31 +108,33 @@ def model(x_ffn, x_lstm, kp):
     with tf.name_scope("ffn"):
 
         ffn_weights = {
-            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]) + 50, 100], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h2': tf.get_variable(name="fw_h2", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h3': tf.get_variable(name="fw_h3", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_out': tf.get_variable(name="fw_out", shape=[25, 1], initializer=tf.contrib.layers.xavier_initializer())
+            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]),75], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h2': tf.get_variable(name="fw_h2", shape=[75,25], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h3': tf.get_variable(name="fw_h3", shape=[35, 10], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_out': tf.get_variable(name="fw_out", shape=[10, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         ffn_bias = {
-            'b_h1': tf.get_variable(name="fb_h1", shape=[100], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_h2': tf.get_variable(name="fb_h2", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_h3': tf.get_variable(name="fb_h3", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h1': tf.get_variable(name="fb_h1", shape=[75], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h2': tf.get_variable(name="fb_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h3': tf.get_variable(name="fb_h3", shape=[10], initializer=tf.contrib.layers.xavier_initializer()),
             'b_out': tf.get_variable(name="fb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
-        x = tf.concat([trans_lstm[-1], x_ffn], axis=1, name="concat_input")
 
-        f_h1 = tf.add(tf.matmul(x, ffn_weights['w_h1']), ffn_bias['b_h1'])
+
+        f_h1 = tf.add(tf.matmul(x_ffn, ffn_weights['w_h1']), ffn_bias['b_h1'])
         f_h1 = tf.nn.sigmoid(f_h1, name="trans_h1")
 
         f_h2 = tf.add(tf.matmul(f_h1, ffn_weights['w_h2']), ffn_bias['b_h2'])
         f_h2 = tf.nn.sigmoid(f_h2, name="trans_h2")
 
-        f_h3 = tf.add(tf.matmul(f_h2, ffn_weights['w_h3']), ffn_bias['b_h3'])
-        f_h3 = tf.nn.sigmoid(f_h3, name="trans_h3")
+        lstm_ffn_concat = tf.concat([h1_sig, f_h2], axis=1, name="concat_input")
 
-        ffn_output = tf.add(tf.matmul(f_h3, ffn_weights['w_out']), ffn_bias['b_out'], name="trans_output")
+        lstm_ffn_concat_output = tf.nn.sigmoid(tf.add(tf.matmul(lstm_ffn_concat, ffn_weights['w_h3']), ffn_bias['b_h3'], name="lstm_ffn_concat_output"))
+
+        f_h3 = tf.add(tf.matmul(lstm_ffn_concat_output, ffn_weights['w_out']), ffn_bias['b_out'])
+        # f_h3 = tf.nn.sigmoid(f_h3, name="trans_h3")
 
     # with tf.name_scope("final_output"):
     #     final_weights = {
@@ -149,7 +148,7 @@ def model(x_ffn, x_lstm, kp):
     #     combined_output = tf.nn.sigmoid(combined_output)
     #     final_output = tf.add(tf.matmul(combined_output, final_weights['w_out']), final_bias['b_out'])
 
-    return ffn_output
+    return f_h3
 
 
 y_ = model(x_ffn, x_lstm, kp)
@@ -306,11 +305,15 @@ with tf.device("/GPU:0"):
             print("Threshold: ", threshold)
             print("\nConfustion Matrix")
 
-            for t in threshold[:4]:
+            for t in threshold[:1]:
                 print("thresh: ", t)
                 con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, t)
                 print(con_mat)
                 print("\n")
+
+            print('Default threshold - 0.5')
+            con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, 0.5)
+            print(con_mat)
 
             z_temp = sess.run(train_avg_loss_summ, feed_dict={z: train_loss / train_batch_size})
             writer.add_summary(z_temp, i)
