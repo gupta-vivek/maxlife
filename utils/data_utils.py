@@ -24,7 +24,7 @@ def sigmoid(z):
 def calculate_precision_recall_curve(y_true, y_pred):
     y_pred = sigmoid(y_pred)
     precision, recall, thresholds = precision_recall_curve(y_true, y_pred)
-    return precision[0], recall[0], thresholds[0]
+    return precision, recall, thresholds
 
 
 def calculate_confusion_matrix(y_true, y_pred, threshold):
