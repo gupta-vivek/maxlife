@@ -80,10 +80,38 @@ with tf.name_scope("placeholders"):
 
 # Model.
 def model(x_ffn, x_lstm, kp):
+
+    with tf.name_scope("transaction"):
+        reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
+        unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
+
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
+        trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
+
+        # trans_weights = {
+        #     'w_h1': tf.get_variable(name="lw_h1", shape=[50, 50], initializer=tf.contrib.layers.xavier_initializer()),
+        #     # 'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
+        #     'w_out': tf.get_variable(name="lw_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
+        # }
+        #
+        # trans_bias = {
+        #     'b_h1': tf.get_variable(name="lb_h1", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
+        #     # 'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
+        #     'b_out': tf.get_variable(name="lb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
+        # }
+        #
+        # h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
+        # h1 = tf.nn.sigmoid(h1, name="trans_h1")
+        # h1 = tf.nn.dropout(h1, keep_prob=kp)
+
+        # h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
+        # h2 = tf.nn.sigmoid(h2, name="trans_h2")
+
+        # trans_output = tf.add(tf.matmul(h1, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
     with tf.name_scope("ffn"):
 
         ffn_weights = {
-            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]), 100], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]) + len(lstm_train_data[0]), 100], initializer=tf.contrib.layers.xavier_initializer()),
             'w_h2': tf.get_variable(name="fw_h2", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
             'w_h3': tf.get_variable(name="fw_h3", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
             'w_out': tf.get_variable(name="fw_out", shape=[25, 1], initializer=tf.contrib.layers.xavier_initializer())
@@ -96,7 +124,9 @@ def model(x_ffn, x_lstm, kp):
             'b_out': tf.get_variable(name="fb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
-        f_h1 = tf.add(tf.matmul(x_ffn, ffn_weights['w_h1']), ffn_bias['b_h1'])
+        x = tf.concat([x_lstm, x_ffn], axis=1, name="concat_input")
+
+        f_h1 = tf.add(tf.matmul(x, ffn_weights['w_h1']), ffn_bias['b_h1'])
         f_h1 = tf.nn.sigmoid(f_h1, name="trans_h1")
 
         f_h2 = tf.add(tf.matmul(f_h1, ffn_weights['w_h2']), ffn_bias['b_h2'])
@@ -107,47 +137,19 @@ def model(x_ffn, x_lstm, kp):
 
         ffn_output = tf.add(tf.matmul(f_h3, ffn_weights['w_out']), ffn_bias['b_out'], name="trans_output")
 
-    with tf.name_scope("transaction"):
-        reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
-        unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
+    # with tf.name_scope("final_output"):
+    #     final_weights = {
+    #         'w_out': tf.get_variable(name="w_out", shape=[2, 1], initializer=tf.contrib.layers.xavier_initializer())
+    #     }
+    #
+    #     final_bias = {
+    #         'b_out': tf.get_variable(name="b_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
+    #     }
+    #     combined_output = tf.concat([ffn_output, trans_output], axis=1, name="combined_output")
+    #     combined_output = tf.nn.sigmoid(combined_output)
+    #     final_output = tf.add(tf.matmul(combined_output, final_weights['w_out']), final_bias['b_out'])
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
-        trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
-
-        trans_weights = {
-            'w_h1': tf.get_variable(name="lw_h1", shape=[50, 50], initializer=tf.contrib.layers.xavier_initializer()),
-            # 'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_out': tf.get_variable(name="lw_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
-        }
-
-        trans_bias = {
-            'b_h1': tf.get_variable(name="lb_h1", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
-            # 'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_out': tf.get_variable(name="lb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
-        }
-
-        h1 = tf.add(tf.matmul(trans_lstm[-1], trans_weights['w_h1']), trans_bias['b_h1'])
-        h1 = tf.nn.sigmoid(h1, name="trans_h1")
-        h1 = tf.nn.dropout(h1, keep_prob=kp)
-
-        # h2 = tf.add(tf.matmul(h1, trans_weights['w_h2']), trans_bias['b_h2'])
-        # h2 = tf.nn.sigmoid(h2, name="trans_h2")
-
-        trans_output = tf.add(tf.matmul(h1, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
-
-    with tf.name_scope("final_output"):
-        final_weights = {
-            'w_out': tf.get_variable(name="w_out", shape=[2, 1], initializer=tf.contrib.layers.xavier_initializer())
-        }
-
-        final_bias = {
-            'b_out': tf.get_variable(name="b_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
-        }
-        combined_output = tf.concat([ffn_output, trans_output], axis=1, name="combined_output")
-        combined_output = tf.nn.sigmoid(combined_output)
-        final_output = tf.add(tf.matmul(combined_output, final_weights['w_out']), final_bias['b_out'])
-
-    return final_output
+    return ffn_output
 
 
 y_ = model(x_ffn, x_lstm, kp)
