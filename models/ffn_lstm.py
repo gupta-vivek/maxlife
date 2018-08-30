@@ -69,7 +69,7 @@ test_batch_size = len(test_y)
 # Placeholders.
 with tf.name_scope("placeholders"):
     x_ffn = tf.placeholder(dtype=tf.float32, shape=[None, len(ffn_train_data[0])], name="input_ffn")
-    x_lstm = tf.placeholder(dtype=tf.float32, shape=[None, len(ffn_train_data[0])], name="input_lstm")
+    x_lstm = tf.placeholder(dtype=tf.float32, shape=[None, len(lstm_train_data[0])], name="input_lstm")
     y = tf.placeholder(dtype=tf.float32, shape=[None, len(ffn_train_label[0])], name="output")
     z = tf.placeholder(dtype=tf.float32, shape=[], name="z")
     lr = tf.placeholder(dtype=tf.float32, shape=[], name="lr")
