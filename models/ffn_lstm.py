@@ -111,7 +111,7 @@ def model(x_ffn, x_lstm, kp):
     with tf.name_scope("ffn"):
 
         ffn_weights = {
-            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]) + len(lstm_train_data[0]), 100], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]) + 50, 100], initializer=tf.contrib.layers.xavier_initializer()),
             'w_h2': tf.get_variable(name="fw_h2", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
             'w_h3': tf.get_variable(name="fw_h3", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
             'w_out': tf.get_variable(name="fw_out", shape=[25, 1], initializer=tf.contrib.layers.xavier_initializer())
