@@ -28,6 +28,7 @@ def calculate_precision_recall_curve(y_true, y_pred):
 
 
 def calculate_confusion_matrix(y_true, y_pred, threshold):
+    y_pred = sigmoid(y_pred)
     y_pred[np.where(y_pred >= threshold)] = 1.0
     y_pred[np.where(y_pred < threshold)] = 0.0
     return confusion_matrix(y_true, y_pred)
