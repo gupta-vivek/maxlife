@@ -35,10 +35,12 @@ split_ratio = [100, 0, 0]
 
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+# lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+# lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 print("ffn data")
 print(ffn_train_data[0])
@@ -302,7 +304,7 @@ with tf.device("/GPU:0"):
             print("Threshold: ", threshold)
             print("\nConfustion Matrix")
 
-            for t in threshold:
+            for t in threshold[:4]:
                 print("thresh: ", t)
                 con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, t)
                 print(con_mat)
