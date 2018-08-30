@@ -8,13 +8,15 @@ Description:
 ..todo::
 """
 import sys
+
 sys.path.append('/home/vivek.gupta/maxlife')
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
-from utils.data_utils import calculate_decile, calculate_gini_score_manual, calculate_precision_recall_curve, calculate_confusion_matrix
+from utils.data_utils import calculate_decile, calculate_gini_score_manual, calculate_precision_recall_curve, \
+    calculate_confusion_matrix
 import numpy as np
 import os
 
@@ -33,13 +35,85 @@ batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
 
+ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
+                                                                    "TPP_POL_MED_NONMED_NON-MED",
+                                                                    "TPP_POL_MED_NONMED_null",
+                                                                    "TPP_POL_MED_NONMED_CLEAR", "TB_POL_RIDER_COUNT_0",
+                                                                    "TB_POL_RIDER_COUNT_1", "TB_POL_RIDER_COUNT_2",
+                                                                    "TB_POL_RIDER_COUNT_3", "TB_POL_RIDER_COUNT_4",
+                                                                    "TB_POL_RIDER_COUNT_5", "TB_POL_RIDER_COUNT_null",
+                                                                    "TB_POL_RIDER_COUNT_6", "TB_POL_RIDER_COUNT_7",
+                                                                    "TPP_POL_PPT_0_0", "TPP_POL_PPT_1_0",
+                                                                    "TPP_POL_PPT_2_0", "TPP_POL_PPT_3_0",
+                                                                    "AGENT_EDUCATION_null", "AGENT_EDUCATION_Post Graduation",
+                                                                    "AGENT_EDUCATION_Under Graduation",
+                                                                    "AGENT_EDUCATION_Doctorate",
+                                                                    "AGENT_EDUCATION_Intermediate",
+                                                                    "AGENT_EDUCATION_Graduation",
+                                                                    "AGT_VINTAGE_0_0",
+                                                                    "AGT_VINTAGE_1_0",
+                                                                    "AGT_VINTAGE_2_0",
+                                                                    "AGT_VINTAGE_3_0",
+                                                                    "AGT_VINTAGE_4_0",
+                                                                    "AGT_VINTAGE_5_0",
+                                                                    "AGT_VINTAGE_null",
+                                                                    "AGT_VINTAGE_6_0",
+                                                                    "GO_ZONE_West 2",
+                                                                    "GO_ZONE_null",
+                                                                    "GO_ZONE_East",
+                                                                    "GO_ZONE_North",
+                                                                    "GO_ZONE_West-Zone",
+                                                                    "GO_ZONE_South Zone",
+                                                                    "GO_ZONE_South_East and Central-Zone",
+                                                                    "GO_ZONE_South East West",
+                                                                    "GO_ZONE_West",
+                                                                    "GO_ZONE_East Zone",
+                                                                    "GO_ZONE_Others",
+                                                                    "GO_ZONE_West 1",
+                                                                    "GO_ZONE_South",
+                                                                    "GO_ZONE_North Zone",
+                                                                    "GO_ZONE_West Zone",
+                                                                    "GO_ZONE_North 2",
+                                                                    "GO_ZONE_North 1",
+                                                                    "NOMINEE_GENDER_FEMALE",
+                                                                    "NOMINEE_GENDER_MALE",
+                                                                    "NOMINEE_GENDER_null",
+                                                                    "TB_CLI_HNI_IND_L",
+                                                                    "TB_CLI_HNI_IND_Y",
+                                                                    "TB_CLI_HNI_IND_N",
+                                                                    "TB_CLI_HNI_IND_null",
+                                                                    "TPP_INSURED_SMOKER_FLG_N",
+                                                                    "TPP_INSURED_SMOKER_FLG_S",
+                                                                    "TPP_INSURED_SMOKER_FLG_null",
+                                                                    "TPP_INSURED_GENDER_FEMALE",
+                                                                    "TPP_INSURED_GENDER_MALE",
+                                                                    "TPP_INSURED_GENDER_null",
+                                                                    "INSURED_AGE_AT_ISSUE_0_0",
+                                                                    "INSURED_AGE_AT_ISSUE_1_0",
+                                                                    "INSURED_AGE_AT_ISSUE_2_0",
+                                                                    "INSURED_AGE_AT_ISSUE_3_0",
+                                                                    "INSURED_AGE_AT_ISSUE_4_0",
+                                                                    "INSURED_AGE_AT_ISSUE_5_0",
+                                                                    "INSURED_AGE_AT_ISSUE_null",
+                                                                    "INSURED_AGE_AT_ISSUE_6_0",
+                                                                    "LTST_SERV_CALL_TYP_POSITIVE",
+                                                                    "LTST_SERV_CALL_TYP_NEUTRAL",
+                                                                    "LTST_SERV_CALL_TYP_NEGATIVE",
+                                                                    "LTST_SERV_CALL_TYP_null"]
+
 print("Reading the data...")
-ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
+                                                       ignore_cols=ignore_col_list, output_label="Lapse_Flag")
+lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
+                                          ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"],
+                                          output_label="Lapse_Flag")
 # lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
-ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True,
+                                                     ignore_cols=ignore_col_list, output_label="Lapse_Flag")
+lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True,
+                                         ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"],
+                                         output_label="Lapse_Flag")
 # lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 print("ffn data")
@@ -52,7 +126,7 @@ print("lstm data")
 print(lstm_train_data[0])
 print(len(lstm_train_data[0]))
 
-pos_weight = len(ffn_train_label)/sum(ffn_train_label)
+pos_weight = len(ffn_train_label) / sum(ffn_train_label)
 
 print("Train Data Size - ", len(ffn_train_data))
 print("Test Data Size - ", len(ffn_test_data))
@@ -80,7 +154,6 @@ with tf.name_scope("placeholders"):
 
 # Model.
 def model(x_ffn, x_lstm, kp):
-
     with tf.name_scope("transaction"):
         reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
@@ -106,10 +179,10 @@ def model(x_ffn, x_lstm, kp):
 
         # trans_output = tf.add(tf.matmul(h1, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
     with tf.name_scope("ffn"):
-
         ffn_weights = {
-            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]),75], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h2': tf.get_variable(name="fw_h2", shape=[75,25], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]), 75],
+                                    initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h2': tf.get_variable(name="fw_h2", shape=[75, 25], initializer=tf.contrib.layers.xavier_initializer()),
             'w_h3': tf.get_variable(name="fw_h3", shape=[35, 10], initializer=tf.contrib.layers.xavier_initializer()),
             'w_out': tf.get_variable(name="fw_out", shape=[10, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
@@ -121,8 +194,6 @@ def model(x_ffn, x_lstm, kp):
             'b_out': tf.get_variable(name="fb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
-
-
         f_h1 = tf.add(tf.matmul(x_ffn, ffn_weights['w_h1']), ffn_bias['b_h1'])
         f_h1 = tf.nn.sigmoid(f_h1, name="trans_h1")
 
@@ -131,7 +202,8 @@ def model(x_ffn, x_lstm, kp):
 
         lstm_ffn_concat = tf.concat([h1_sig, f_h2], axis=1, name="concat_input")
 
-        lstm_ffn_concat_output = tf.nn.sigmoid(tf.add(tf.matmul(lstm_ffn_concat, ffn_weights['w_h3']), ffn_bias['b_h3'], name="lstm_ffn_concat_output"))
+        lstm_ffn_concat_output = tf.nn.sigmoid(
+            tf.add(tf.matmul(lstm_ffn_concat, ffn_weights['w_h3']), ffn_bias['b_h3'], name="lstm_ffn_concat_output"))
 
         f_h3 = tf.add(tf.matmul(lstm_ffn_concat_output, ffn_weights['w_out']), ffn_bias['b_out'])
         # f_h3 = tf.nn.sigmoid(f_h3, name="trans_h3")
@@ -153,7 +225,6 @@ def model(x_ffn, x_lstm, kp):
 
 y_ = model(x_ffn, x_lstm, kp)
 tf.add_to_collection("y_", y_)
-
 
 # Loss.
 with tf.name_scope("loss"):
@@ -182,10 +253,9 @@ test_decile_summ = tf.summary.scalar("test_decile", z)
 
 logdir = "../tensorboard/ffn_lstm_model/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
-saved_model_dir ="../maxlife_models/"
+saved_model_dir = "../maxlife_models/"
 if not os.path.isdir(saved_model_dir):
     os.mkdir(saved_model_dir)
-
 
 init = tf.global_variables_initializer()
 
@@ -222,13 +292,16 @@ with tf.device("/GPU:0"):
                 train_count += 1
                 count += 1
 
-                _, l = sess.run([optimizer, loss], feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, y: train_label, lr: learning_rate, kp: keep_probability})
+                _, l = sess.run([optimizer, loss],
+                                feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, y: train_label,
+                                           lr: learning_rate, kp: keep_probability})
 
                 train_loss += l
 
                 if count % display_count == 0:
                     train_summary = sess.run(train_loss_summ,
-                                                     feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, y: train_label, kp: 1.0})
+                                             feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, y: train_label,
+                                                        kp: 1.0})
                     writer.add_summary(train_summary, train_count)
                     print("Train Batch Count: ", count)
                     print("Train Iter Loss: ", l)
@@ -248,7 +321,9 @@ with tf.device("/GPU:0"):
                 test_loss += l
 
                 if count % display_count == 0:
-                    test_summary = sess.run(test_loss_summ, feed_dict={x_ffn: test_data_ffn, x_lstm: test_data_lstm, y: test_label, kp: 1.0})
+                    test_summary = sess.run(test_loss_summ,
+                                            feed_dict={x_ffn: test_data_ffn, x_lstm: test_data_lstm, y: test_label,
+                                                       kp: 1.0})
                     writer.add_summary(test_summary, test_count)
                     print("Test Batch Count: ", count)
                     print("Test Iter Loss: ", l)
@@ -276,13 +351,13 @@ with tf.device("/GPU:0"):
             train_decile_score = calculate_decile(train_predictions, list(ffn_train_label))
             test_decile_score = calculate_decile(test_predictions, list(ffn_test_label))
 
-            ffn_train_label = ffn_train_label.reshape(ffn_train_label.shape[0],)
+            ffn_train_label = ffn_train_label.reshape(ffn_train_label.shape[0], )
             train_predictions = np.asarray(train_predictions)
-            train_predictions = train_predictions.reshape(train_predictions.shape[0],)
+            train_predictions = train_predictions.reshape(train_predictions.shape[0], )
 
-            ffn_test_label = ffn_test_label.reshape(ffn_test_label.shape[0],)
+            ffn_test_label = ffn_test_label.reshape(ffn_test_label.shape[0], )
             test_predictions = np.asarray(test_predictions)
-            test_predictions = test_predictions.reshape(test_predictions.shape[0],)
+            test_predictions = test_predictions.reshape(test_predictions.shape[0], )
 
             train_gini = calculate_gini_score_manual(ffn_train_label, train_predictions)
             test_gini = calculate_gini_score_manual(ffn_test_label, test_predictions)
