@@ -29,7 +29,7 @@ lstm_train_path = sys.argv[4]
 lstm_test_path = sys.argv[5]
 
 learning_rate = 0.001
-keep_probability = 0.5
+keep_probability = 0.7
 epochs = 200
 batch_size = 512
 display_count = 1000
