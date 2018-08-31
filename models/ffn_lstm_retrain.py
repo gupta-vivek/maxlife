@@ -174,7 +174,7 @@ with tf.device("/GPU:0"):
 
         graph = tf.get_default_graph()
 
-        x_ffn = graph.get_tensor_by_name('placeholders/input_ffm:0')
+        x_ffn = graph.get_tensor_by_name('placeholders/input_ffn:0')
         x_lstm = graph.get_tensor_by_name('placeholders/input_lstm:0')
         y = graph.get_tensor_by_name('placeholders/output:0')
         z = graph.get_tensor_by_name('placeholders/z:0')
