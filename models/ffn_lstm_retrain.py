@@ -32,7 +32,7 @@ lstm_test_path = sys.argv[5]
 learning_rate = 0.001
 keep_probability = 0.7
 epochs = 200
-batch_size = 512
+batch_size = 256
 display_count = 1000
 split_ratio = [100, 0, 0]
 
@@ -204,7 +204,7 @@ with tf.device("/GPU:0"):
 
         sess.run(lr, feed_dict={lr: learning_rate})
 
-        for i in range(1, epochs + 1):
+        for i in range(previous_count + 1, previous_count + epochs + 1):
 
             train_ffn_x = divide_batches_gen(ffn_train_data, batch_size)
             test_ffn_x = divide_batches_gen(ffn_test_data, batch_size)
