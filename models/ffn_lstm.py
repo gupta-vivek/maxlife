@@ -36,70 +36,70 @@ display_count = 1000
 split_ratio = [100, 0, 0]
 
 ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
-                                                                    "TPP_POL_MED_NONMED_NON-MED",
-                                                                    "TPP_POL_MED_NONMED_null",
-                                                                    "TPP_POL_MED_NONMED_CLEAR", "TB_POL_RIDER_COUNT_0",
-                                                                    "TB_POL_RIDER_COUNT_1", "TB_POL_RIDER_COUNT_2",
-                                                                    "TB_POL_RIDER_COUNT_3", "TB_POL_RIDER_COUNT_4",
-                                                                    "TB_POL_RIDER_COUNT_5", "TB_POL_RIDER_COUNT_null",
-                                                                    "TB_POL_RIDER_COUNT_6", "TB_POL_RIDER_COUNT_7",
-                                                                    "TPP_POL_PPT_0_0", "TPP_POL_PPT_1_0",
-                                                                    "TPP_POL_PPT_2_0", "TPP_POL_PPT_3_0",
-                                                                    "AGENT_EDUCATION_null", "AGENT_EDUCATION_Post Graduation",
-                                                                    "AGENT_EDUCATION_Under Graduation",
-                                                                    "AGENT_EDUCATION_Doctorate",
-                                                                    "AGENT_EDUCATION_Intermediate",
-                                                                    "AGENT_EDUCATION_Graduation",
-                                                                    "AGT_VINTAGE_0_0",
-                                                                    "AGT_VINTAGE_1_0",
-                                                                    "AGT_VINTAGE_2_0",
-                                                                    "AGT_VINTAGE_3_0",
-                                                                    "AGT_VINTAGE_4_0",
-                                                                    "AGT_VINTAGE_5_0",
-                                                                    "AGT_VINTAGE_null",
-                                                                    "AGT_VINTAGE_6_0",
-                                                                    "GO_ZONE_West 2",
-                                                                    "GO_ZONE_null",
-                                                                    "GO_ZONE_East",
-                                                                    "GO_ZONE_North",
-                                                                    "GO_ZONE_West-Zone",
-                                                                    "GO_ZONE_South Zone",
-                                                                    "GO_ZONE_South_East and Central-Zone",
-                                                                    "GO_ZONE_South East West",
-                                                                    "GO_ZONE_West",
-                                                                    "GO_ZONE_East Zone",
-                                                                    "GO_ZONE_Others",
-                                                                    "GO_ZONE_West 1",
-                                                                    "GO_ZONE_South",
-                                                                    "GO_ZONE_North Zone",
-                                                                    "GO_ZONE_West Zone",
-                                                                    "GO_ZONE_North 2",
-                                                                    "GO_ZONE_North 1",
-                                                                    "NOMINEE_GENDER_FEMALE",
-                                                                    "NOMINEE_GENDER_MALE",
-                                                                    "NOMINEE_GENDER_null",
-                                                                    "TB_CLI_HNI_IND_L",
-                                                                    "TB_CLI_HNI_IND_Y",
-                                                                    "TB_CLI_HNI_IND_N",
-                                                                    "TB_CLI_HNI_IND_null",
-                                                                    "TPP_INSURED_SMOKER_FLG_N",
-                                                                    "TPP_INSURED_SMOKER_FLG_S",
-                                                                    "TPP_INSURED_SMOKER_FLG_null",
-                                                                    "TPP_INSURED_GENDER_FEMALE",
-                                                                    "TPP_INSURED_GENDER_MALE",
-                                                                    "TPP_INSURED_GENDER_null",
-                                                                    "INSURED_AGE_AT_ISSUE_0_0",
-                                                                    "INSURED_AGE_AT_ISSUE_1_0",
-                                                                    "INSURED_AGE_AT_ISSUE_2_0",
-                                                                    "INSURED_AGE_AT_ISSUE_3_0",
-                                                                    "INSURED_AGE_AT_ISSUE_4_0",
-                                                                    "INSURED_AGE_AT_ISSUE_5_0",
-                                                                    "INSURED_AGE_AT_ISSUE_null",
-                                                                    "INSURED_AGE_AT_ISSUE_6_0",
-                                                                    "LTST_SERV_CALL_TYP_POSITIVE",
-                                                                    "LTST_SERV_CALL_TYP_NEUTRAL",
-                                                                    "LTST_SERV_CALL_TYP_NEGATIVE",
-                                                                    "LTST_SERV_CALL_TYP_null"]
+                   "TPP_POL_MED_NONMED_NON-MED",
+                   "TPP_POL_MED_NONMED_null",
+                   "TPP_POL_MED_NONMED_CLEAR", "TB_POL_RIDER_COUNT_0",
+                   "TB_POL_RIDER_COUNT_1", "TB_POL_RIDER_COUNT_2",
+                   "TB_POL_RIDER_COUNT_3", "TB_POL_RIDER_COUNT_4",
+                   "TB_POL_RIDER_COUNT_5", "TB_POL_RIDER_COUNT_null",
+                   "TB_POL_RIDER_COUNT_6", "TB_POL_RIDER_COUNT_7",
+                   "TPP_POL_PPT_0_0", "TPP_POL_PPT_1_0",
+                   "TPP_POL_PPT_2_0", "TPP_POL_PPT_3_0",
+                   "AGENT_EDUCATION_null", "AGENT_EDUCATION_Post Graduation",
+                   "AGENT_EDUCATION_Under Graduation",
+                   "AGENT_EDUCATION_Doctorate",
+                   "AGENT_EDUCATION_Intermediate",
+                   "AGENT_EDUCATION_Graduation",
+                   "AGT_VINTAGE_0_0",
+                   "AGT_VINTAGE_1_0",
+                   "AGT_VINTAGE_2_0",
+                   "AGT_VINTAGE_3_0",
+                   "AGT_VINTAGE_4_0",
+                   "AGT_VINTAGE_5_0",
+                   "AGT_VINTAGE_null",
+                   "AGT_VINTAGE_6_0",
+                   "GO_ZONE_West 2",
+                   "GO_ZONE_null",
+                   "GO_ZONE_East",
+                   "GO_ZONE_North",
+                   "GO_ZONE_West-Zone",
+                   "GO_ZONE_South Zone",
+                   "GO_ZONE_South_East and Central-Zone",
+                   "GO_ZONE_South East West",
+                   "GO_ZONE_West",
+                   "GO_ZONE_East Zone",
+                   "GO_ZONE_Others",
+                   "GO_ZONE_West 1",
+                   "GO_ZONE_South",
+                   "GO_ZONE_North Zone",
+                   "GO_ZONE_West Zone",
+                   "GO_ZONE_North 2",
+                   "GO_ZONE_North 1",
+                   "NOMINEE_GENDER_FEMALE",
+                   "NOMINEE_GENDER_MALE",
+                   "NOMINEE_GENDER_null",
+                   "TB_CLI_HNI_IND_L",
+                   "TB_CLI_HNI_IND_Y",
+                   "TB_CLI_HNI_IND_N",
+                   "TB_CLI_HNI_IND_null",
+                   "TPP_INSURED_SMOKER_FLG_N",
+                   "TPP_INSURED_SMOKER_FLG_S",
+                   "TPP_INSURED_SMOKER_FLG_null",
+                   "TPP_INSURED_GENDER_FEMALE",
+                   "TPP_INSURED_GENDER_MALE",
+                   "TPP_INSURED_GENDER_null",
+                   "INSURED_AGE_AT_ISSUE_0_0",
+                   "INSURED_AGE_AT_ISSUE_1_0",
+                   "INSURED_AGE_AT_ISSUE_2_0",
+                   "INSURED_AGE_AT_ISSUE_3_0",
+                   "INSURED_AGE_AT_ISSUE_4_0",
+                   "INSURED_AGE_AT_ISSUE_5_0",
+                   "INSURED_AGE_AT_ISSUE_null",
+                   "INSURED_AGE_AT_ISSUE_6_0",
+                   "LTST_SERV_CALL_TYP_POSITIVE",
+                   "LTST_SERV_CALL_TYP_NEUTRAL",
+                   "LTST_SERV_CALL_TYP_NEGATIVE",
+                   "LTST_SERV_CALL_TYP_null"]
 
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
@@ -126,7 +126,9 @@ print("lstm data")
 print(lstm_train_data[0])
 print(len(lstm_train_data[0]))
 
-pos_weight = len(ffn_train_label) / sum(ffn_train_label)
+# pos_weight = len(ffn_train_label) / sum(ffn_train_label)
+
+pos_weight = np.count_nonzero(ffn_train_label == 0) / np.count_nonzero(ffn_train_label == 1)
 
 print("Train Data Size - ", len(ffn_train_data))
 print("Test Data Size - ", len(ffn_test_data))
@@ -158,15 +160,15 @@ def model(x_ffn, x_lstm, kp):
         reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=24, activation=tf.nn.relu)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
 
         trans_weights = {
-            'w_h1': tf.get_variable(name="lw_h1", shape=[24, 10], initializer=tf.contrib.layers.xavier_initializer())
+            'w_h1': tf.get_variable(name="lw_h1", shape=[50, 20], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         trans_bias = {
-            'b_h1': tf.get_variable(name="lb_h1", shape=[10], initializer=tf.contrib.layers.xavier_initializer())
+            'b_h1': tf.get_variable(name="lb_h1", shape=[20], initializer=tf.contrib.layers.xavier_initializer())
 
         }
 
@@ -180,17 +182,17 @@ def model(x_ffn, x_lstm, kp):
         # trans_output = tf.add(tf.matmul(h1, trans_weights['w_out']), trans_bias['b_out'], name="trans_output")
     with tf.name_scope("ffn"):
         ffn_weights = {
-            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]), 75],
+            'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]), 100],
                                     initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h2': tf.get_variable(name="fw_h2", shape=[75, 25], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h3': tf.get_variable(name="fw_h3", shape=[35, 10], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_out': tf.get_variable(name="fw_out", shape=[10, 1], initializer=tf.contrib.layers.xavier_initializer())
+            'w_h2': tf.get_variable(name="fw_h2", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h3': tf.get_variable(name="fw_h3", shape=[70, 20], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_out': tf.get_variable(name="fw_out", shape=[20, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         ffn_bias = {
-            'b_h1': tf.get_variable(name="fb_h1", shape=[75], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_h2': tf.get_variable(name="fb_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
-            'b_h3': tf.get_variable(name="fb_h3", shape=[10], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h1': tf.get_variable(name="fb_h1", shape=[100], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h2': tf.get_variable(name="fb_h2", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h3': tf.get_variable(name="fb_h3", shape=[20], initializer=tf.contrib.layers.xavier_initializer()),
             'b_out': tf.get_variable(name="fb_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
