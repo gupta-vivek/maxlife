@@ -235,5 +235,47 @@ def data_generator(data_path, ratio_ones=0.3, ratio_zeroes=0.7, length=2100000, 
         new_df_test.to_csv(output_dir + "/trans2_test.csv", index=False)
 
 
+def month_mode_split(ffn_path, lstm_path, output_dir):
+    lstm_df = pd.read_csv(lstm_path)
+    ffn_df = pd.read_csv(ffn_path)
+
+    print("12")
+    temp_lstm_df = lstm_df.loc[lstm_df["TB_POL_BILL_MODE_CD"] == 12]
+    temp_ffn_df = ffn_df.reindex(temp_lstm_df.index)
+    print(temp_lstm_df.head())
+    print(temp_ffn_df.head())
+
+    temp_lstm_df.to_csv(output_dir + "annual_lstm.csv", index=False)
+    temp_ffn_df.to_csv(output_dir + "annual_ffn.csv", index=False)
+
+    print("6")
+    temp_lstm_df = lstm_df.loc[lstm_df["TB_POL_BILL_MODE_CD"] == 6]
+    temp_ffn_df = ffn_df.reindex(temp_lstm_df.index)
+    print(temp_lstm_df.head())
+    print(temp_ffn_df.head())
+
+    temp_lstm_df.to_csv(output_dir + "half_lstm.csv", index=False)
+    temp_ffn_df.to_csv(output_dir + "half_ffn.csv", index=False)
+
+    print("3")
+    temp_lstm_df = lstm_df.loc[lstm_df["TB_POL_BILL_MODE_CD"] == 3]
+    temp_ffn_df = ffn_df.reindex(temp_lstm_df.index)
+    print(temp_lstm_df.head())
+    print(temp_ffn_df.head())
+
+    temp_lstm_df.to_csv(output_dir + "quart_lstm.csv", index=False)
+    temp_ffn_df.to_csv(output_dir + "quart_ffn.csv", index=False)
+
+    print("1")
+    temp_lstm_df = lstm_df.loc[lstm_df["TB_POL_BILL_MODE_CD"] == 1]
+    temp_ffn_df = ffn_df.reindex(temp_lstm_df.index)
+    print(temp_lstm_df.head())
+    print(temp_ffn_df.head())
+
+    temp_lstm_df.to_csv(output_dir + "monthly_lstm.csv", index=False)
+    temp_ffn_df.to_csv(output_dir + "monthly_ffn.csv", index=False)
+
+
+month_mode_split("~/ffn_data.csv", "~/LSTM_FINAL_DATA_MODEL.csv", "~/mop_split_data/")
 # data_generator("/Users/vivek/transaction.csv", output_dir="/Users/vivek/")
 # stratified_generator("/Users/vivek/final_trans.csv", train_ratio=0.5, test_ratio=0.5, output_dir="/Users/vivek/")
