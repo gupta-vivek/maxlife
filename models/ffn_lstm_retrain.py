@@ -31,8 +31,8 @@ lstm_test_path = sys.argv[5]
 
 learning_rate = 0.001
 keep_probability = 0.7
-epochs = 200
-batch_size = 256
+epochs = 25
+batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
 
@@ -100,20 +100,40 @@ ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
                    "LTST_SERV_CALL_TYP_POSITIVE",
                    "LTST_SERV_CALL_TYP_NEUTRAL",
                    "LTST_SERV_CALL_TYP_NEGATIVE",
-                   "LTST_SERV_CALL_TYP_null"]
+                   "LTST_SERV_CALL_TYP_null",
+                   "TB_POL_CSTAT_CD_PCRU",
+                   "TB_POL_CSTAT_CD_5",
+                   "TB_POL_CSTAT_CD_4",
+                   "TB_POL_CSTAT_CD_1A",
+                   "TB_POL_CSTAT_CD_PECC",
+                   "TB_POL_CSTAT_CD_PCCU",
+                   "TB_POL_CSTAT_CD_PCRC",
+                   "TB_POL_CSTAT_CD_2",
+                   "TB_POL_CSTAT_CD_M",
+                   "TB_POL_CSTAT_CD_B",
+                   "TB_POL_CSTAT_CD_D",
+                   "TB_POL_CSTAT_CD_PERU",
+                   "TB_POL_CSTAT_CD_Y",
+                   "TB_POL_CSTAT_CD_1",
+                   "TB_POL_CSTAT_CD_R",
+                   "TB_POL_CSTAT_CD_A",
+                   "TB_POL_CSTAT_CD_3",
+                   "TB_POL_CSTAT_CD_E",
+                   "TB_POL_CSTAT_CD_PERC",
+                   "TB_POL_CSTAT_CD_C"]
 
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
                                                        ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
-                                          ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"],
+                                          ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
                                           output_label="Lapse_Flag")
 # lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True,
                                                      ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True,
-                                         ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"],
+                                         ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
                                          output_label="Lapse_Flag")
 # lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
