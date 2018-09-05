@@ -31,9 +31,46 @@ batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
 
+ignore_col_list = ["POL_ID", "DATA_MONTH", "CLI_INCOME_TODAY",
+ "TB_POL_CSTAT_CD_PCRU",
+"TB_POL_CSTAT_CD_5",
+"TB_POL_CSTAT_CD_4",
+"TB_POL_CSTAT_CD_1A",
+"TB_POL_CSTAT_CD_PECC",
+"TB_POL_CSTAT_CD_PCCU",
+"TB_POL_CSTAT_CD_PCRC",
+"TB_POL_CSTAT_CD_2",
+"TB_POL_CSTAT_CD_M",
+"TB_POL_CSTAT_CD_B",
+"TB_POL_CSTAT_CD_D",
+"TB_POL_CSTAT_CD_PERU",
+"TB_POL_CSTAT_CD_Y",
+"TB_POL_CSTAT_CD_1",
+"TB_POL_CSTAT_CD_R",
+"TB_POL_CSTAT_CD_A",
+"TB_POL_CSTAT_CD_3",
+"TB_POL_CSTAT_CD_E",
+"TB_POL_CSTAT_CD_PERC",
+"TB_POL_CSTAT_CD_C",
+"TPP_INSURED_MARITAL_STS_Others",
+"TPP_INSURED_MARITAL_STS_Married",
+"TPP_INSURED_MARITAL_STS_Single",
+ "TPP_INSURED_GENDER_FEMALE",
+                   "TPP_INSURED_GENDER_MALE",
+                   "TPP_INSURED_GENDER_null",
+"TPP_INSURED_INDUSTRY_missing",
+"TPP_INSURED_INDUSTRY_high",
+"TPP_INSURED_INDUSTRY_medium",
+"TPP_INSURED_INDUSTRY_low",
+"TPP_INSURED_INDUSTRY_others",
+"TPP_INSURED_EDU_(A)Illiterate",
+"TPP_INSURED_EDU_(D)Others",
+"TPP_INSURED_EDU_(C)Grad & above",
+"TPP_INSURED_EDU_(B)Schooling", "TPP_INSURED_INCOME"]
+
 print("Reading the data...")
-trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=ignore_col_list, output_label="Lapse_Flag")
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 
 print(trans_train_data[0])
 print(trans_train_label[0])
