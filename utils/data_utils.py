@@ -279,6 +279,5 @@ def month_mode_split(ffn_path, lstm_path, output_dir):
     temp_ffn_df.to_csv(output_dir + "monthly_ffn.csv", index=False)
 
 
-#month_mode_split("~/ffn_data.csv", "~/LSTM_FINAL_DATA_MODEL.csv", "~/mop_split_data/")
-# data_generator("/Users/vivek/transaction.csv", output_dir="/Users/vivek/")
-#stratified_generator2("~/yearly_ffn2.csv", "~/yearly_lstm2.csv", train_ratio=0.6, test_ratio=0.4, output_dir="~/")
+if __name__ == "__main__":
+    stratified_generator2("~/yearly_ffn2.csv", "~/yearly_lstm2.csv", train_ratio=0.6, test_ratio=0.4, output_dir="~/")
