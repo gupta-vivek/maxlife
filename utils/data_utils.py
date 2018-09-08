@@ -102,6 +102,7 @@ def calculate_decile(predictions, labels):
         x = length_predictions_10
         length_predictions_10 += length_predictions_10_x
 
+    #print(decile_dict)
     dec_score = 0
     count = 0
     for k in decile_dict.keys():
@@ -115,8 +116,8 @@ def calculate_decile(predictions, labels):
 
 def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     trans_df = pd.read_csv(trans_path)
-    trans_df_Y = trans_df[['Lapse_Flag', 'TB_POL_BILL_MODE_CD']]
-    trans_df_X = trans_df.drop(['Lapse_Flag', 'TB_POL_BILL_MODE_CD'], axis=1)
+    trans_df_Y = trans_df[['Lapse_Flag']]
+    trans_df_X = trans_df.drop(['Lapse_Flag'], axis=1)
 
     train_ratio = float(train_ratio)
     test_ratio = float(test_ratio)
@@ -138,20 +139,20 @@ def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     print("Train")
     print("Transaction")
     train_df = trans_df.reindex(train_index)
-    train_df.to_csv(output_dir + "final_trans_train.csv", index=False)
+    train_df.to_csv(output_dir + "half_train.csv", index=False)
     print(train_df.head())
 
     print("Test")
     print("Transaction")
     test_df = trans_df.reindex(test_index)
-    test_df.to_csv(output_dir + "final_trans_test.csv", index=False)
+    test_df.to_csv(output_dir + "half_test.csv", index=False)
     print(test_df.head())
 
 
 def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_dir):
     trans_df = pd.read_csv(trans_path)
-    trans_df_Y = trans_df[['Lapse_Flag', 'TB_POL_BILL_MODE_CD']]
-    trans_df_X = trans_df.drop(['Lapse_Flag', 'TB_POL_BILL_MODE_CD'], axis=1)
+    trans_df_Y = trans_df[['Lapse_Flag']]
+    trans_df_X = trans_df.drop(['Lapse_Flag'], axis=1)
 
     ffn_df = pd.read_csv(ffn_path)
 
@@ -180,13 +181,14 @@ def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_
     train_trans_df = trans_df.reindex(idx)
     train_ffn_df = ffn_df.reindex(idx)
 
-    train_trans_df.to_csv(output_dir + "final_trans_train.csv", index=False)
+    train_trans_df.to_csv(output_dir + "yearly_lstm_train2.csv", index=False)
     print(train_trans_df.head())
-
+    print(len(train_trans_df))
+	
     print("FFN")
-    train_ffn_df.to_csv(output_dir + "final_ffn_train.csv", index=False)
+    train_ffn_df.to_csv(output_dir + "yearly_ffn_train2.csv", index=False)
     print(train_ffn_df.head())
-
+    print(len(train_ffn_df))
     print("Test")
     print("Transaction")
     # test_df = trans_df.reindex(test_index)
@@ -195,12 +197,13 @@ def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_
     test_trans_df = trans_df.reindex(idx)
     test_ffn_df = ffn_df.reindex(idx)
 
-    test_trans_df.to_csv(output_dir + "final_trans_test.csv", index=False)
+    test_trans_df.to_csv(output_dir + "yearly_lstm_test2.csv", index=False)
     print(test_trans_df.head())
-
+    print(len(test_trans_df))
     print("FFN")
-    test_ffn_df.to_csv(output_dir + "final_ffn_test.csv", index=False)
+    test_ffn_df.to_csv(output_dir + "yearly_ffn_test2.csv", index=False)
     print(test_ffn_df.head())
+    print(len(test_ffn_df))
 
 
 def data_generator(data_path, ratio_ones=0.3, ratio_zeroes=0.7, length=2100000, output_dir=None, test=True):
@@ -276,6 +279,6 @@ def month_mode_split(ffn_path, lstm_path, output_dir):
     temp_ffn_df.to_csv(output_dir + "monthly_ffn.csv", index=False)
 
 
-month_mode_split("~/ffn_data.csv", "~/LSTM_FINAL_DATA_MODEL.csv", "~/mop_split_data/")
+#month_mode_split("~/ffn_data.csv", "~/LSTM_FINAL_DATA_MODEL.csv", "~/mop_split_data/")
 # data_generator("/Users/vivek/transaction.csv", output_dir="/Users/vivek/")
-# stratified_generator("/Users/vivek/final_trans.csv", train_ratio=0.5, test_ratio=0.5, output_dir="/Users/vivek/")
+#stratified_generator2("~/yearly_ffn2.csv", "~/yearly_lstm2.csv", train_ratio=0.6, test_ratio=0.4, output_dir="~/")

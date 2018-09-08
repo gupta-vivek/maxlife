@@ -262,7 +262,7 @@ with tf.device("/GPU:0"):
             test_gini = calculate_gini_score_manual(trans_test_label, test_predictions)
 
             precision, recall, threshold = calculate_precision_recall_curve(trans_test_label, test_predictions)
-            con_mat = calculate_confusion_matrix(trans_test_label, test_predictions, threshold)
+            #con_mat = calculate_confusion_matrix(trans_test_label, test_predictions, threshold)
 
             print("\n\nEpoch:  ", i)
             print("Loss")
@@ -277,9 +277,9 @@ with tf.device("/GPU:0"):
             print("\nPrecision: ", precision)
             print("Recall: ", recall)
             print("Threshold: ", threshold)
-            print("\nConfustion Matrix")
-            print(con_mat)
-            print("\n\n")
+            #print("\nConfustion Matrix")
+            #print(con_mat)
+            #print("\n\n")
 
             z_temp = sess.run(train_avg_loss_summ, feed_dict={z: train_loss / train_batch_size})
             writer.add_summary(z_temp, i)

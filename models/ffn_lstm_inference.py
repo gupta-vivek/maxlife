@@ -158,7 +158,7 @@ print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
                                                        ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
-                                          ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
+                                          ignore_cols=["POL_ID", "DATA_MONTH", 'MI', 'TB_POL_BILL_MODE_CD'],
                                           output_label="Lapse_Flag")
 
 print("ffn data")
@@ -201,7 +201,7 @@ with tf.device("/GPU:0"):
         # model_saver.restore(sess, tf.train.latest_checkpoint('maxlife_models/'))
 
         model_saver.restore(sess, ckpt)
-        previous_count = int(filename.split('-')[1].split('.')[0])
+        #previous_count = int(filename.split('-')[1].split('.')[0])
 
         graph = tf.get_default_graph()
 
@@ -241,7 +241,7 @@ with tf.device("/GPU:0"):
 
         train_gini = calculate_gini_score_manual(ffn_train_label, train_predictions)
         precision, recall, threshold = calculate_precision_recall_curve(ffn_train_label, train_predictions)
-        con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, threshold)
+        #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, threshold)
 
         print("Decile")
         print("Test: ", train_decile_score)
@@ -250,21 +250,27 @@ with tf.device("/GPU:0"):
         print("\nPrecision: ", precision)
         print("Recall: ", recall)
         print("Threshold: ", threshold)
-        print("\nConfustion Matrix")
+        #print("\nConfustion Matrix")
 
-        for t in threshold[:1]:
-            print("thresh: ", t)
-            con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, t)
-            print(con_mat)
-            print("\n")
+       # for t in threshold[:1]:
+            #print("thresh: ", t)
+            #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, t)
+            #print(con_mat)
+            #print("\n")
 
-        print('Default threshold - 0.5')
-        con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, 0.5)
-        print(con_mat)
-
+        #print('Default threshold - 0.5')
+        #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, 0.5)
+        #print(con_mat)
+        temp_df = pd.read_csv(lstm_train_path)
         df = pd.DataFrame()
-        df['Predictions'] = train_predictions
-        df['Sigmoid_Output'] = sigmoid(train_predictions)
-        df['Label'] = ffn_train_label
+        df['POL_ID'] = temp_df['POL_ID']
+        df['DATA_MONTH'] = temp_df['DATA_MONTH']
+
+        y_pred = sigmoid(train_predictions)
+        y_pred[np.where(y_pred >= 0.5)] = 1.0
+        y_pred[np.where(y_pred < 0.5)] = 0.0
+        df['Predictions'] = y_pred
+        df['Raw_Output'] = sigmoid(train_predictions)
+        #df['Label'] = ffn_train_label
 
         df.to_csv(output_file, index=False)

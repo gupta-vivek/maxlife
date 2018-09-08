@@ -28,9 +28,9 @@ ffn_test_path = sys.argv[3]
 lstm_train_path = sys.argv[4]
 lstm_test_path = sys.argv[5]
 
-learning_rate = 0.001
+learning_rate = 0.0001
 keep_probability = 0.7
-epochs = 25
+epochs = 200
 batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
@@ -121,18 +121,55 @@ ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
 "TB_POL_CSTAT_CD_PERC",
 "TB_POL_CSTAT_CD_C"]
 
+ignore_col_list = ["POL_ID", "DATA_MONTH", "CLI_INCOME_TODAY",
+ "TB_POL_CSTAT_CD_PCRU",
+"TB_POL_CSTAT_CD_5",
+"TB_POL_CSTAT_CD_4",
+"TB_POL_CSTAT_CD_1A",
+"TB_POL_CSTAT_CD_PECC",
+"TB_POL_CSTAT_CD_PCCU",
+"TB_POL_CSTAT_CD_PCRC",
+"TB_POL_CSTAT_CD_2",
+"TB_POL_CSTAT_CD_M",
+"TB_POL_CSTAT_CD_B",
+"TB_POL_CSTAT_CD_D",
+"TB_POL_CSTAT_CD_PERU",
+"TB_POL_CSTAT_CD_Y",
+"TB_POL_CSTAT_CD_1",
+"TB_POL_CSTAT_CD_R",
+"TB_POL_CSTAT_CD_A",
+"TB_POL_CSTAT_CD_3",
+"TB_POL_CSTAT_CD_E",
+"TB_POL_CSTAT_CD_PERC",
+"TB_POL_CSTAT_CD_C",
+"TPP_INSURED_MARITAL_STS_Others",
+"TPP_INSURED_MARITAL_STS_Married",
+"TPP_INSURED_MARITAL_STS_Single",
+ "TPP_INSURED_GENDER_FEMALE",
+                   "TPP_INSURED_GENDER_MALE",
+                   "TPP_INSURED_GENDER_null",
+"TPP_INSURED_INDUSTRY_missing",
+"TPP_INSURED_INDUSTRY_high",
+"TPP_INSURED_INDUSTRY_medium",
+"TPP_INSURED_INDUSTRY_low",
+"TPP_INSURED_INDUSTRY_others",
+"TPP_INSURED_EDU_(A)Illiterate",
+"TPP_INSURED_EDU_(D)Others",
+"TPP_INSURED_EDU_(C)Grad & above",
+"TPP_INSURED_EDU_(B)Schooling", "TPP_INSURED_INCOME"]
+
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
                                                        ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
-                                          ignore_cols=["POL_ID", "DATA_MONTH","MODE_PAYMENT"],
+                                          ignore_cols=["POL_ID", 'DATA_MONTH'],
                                           output_label="Lapse_Flag")
 # lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True,
                                                      ignore_cols=ignore_col_list, output_label="Lapse_Flag")
 lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True,
-                                         ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
+                                         ignore_cols=["POL_ID", 'DATA_MONTH'],
                                          output_label="Lapse_Flag")
 # lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
@@ -180,15 +217,15 @@ def model(x_ffn, x_lstm, kp):
         reshape_trans_data = tf.reshape(x_lstm, name="reshape_trans", shape=[-1, len(lstm_train_data[0]), 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=10, activation=tf.nn.relu)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
 
         trans_weights = {
-            'w_h1': tf.get_variable(name="lw_h1", shape=[50, 20], initializer=tf.contrib.layers.xavier_initializer())
+            'w_h1': tf.get_variable(name="lw_h1", shape=[10, 10], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         trans_bias = {
-            'b_h1': tf.get_variable(name="lb_h1", shape=[20], initializer=tf.contrib.layers.xavier_initializer())
+            'b_h1': tf.get_variable(name="lb_h1", shape=[10], initializer=tf.contrib.layers.xavier_initializer())
 
         }
 
@@ -205,7 +242,7 @@ def model(x_ffn, x_lstm, kp):
             'w_h1': tf.get_variable(name="fw_h1", shape=[len(ffn_train_data[0]), 100],
                                     initializer=tf.contrib.layers.xavier_initializer()),
             'w_h2': tf.get_variable(name="fw_h2", shape=[100, 50], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_h3': tf.get_variable(name="fw_h3", shape=[70, 20], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h3': tf.get_variable(name="fw_h3", shape=[60, 20], initializer=tf.contrib.layers.xavier_initializer()),
             'w_out': tf.get_variable(name="fw_out", shape=[20, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
