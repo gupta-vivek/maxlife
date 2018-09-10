@@ -13,7 +13,6 @@ import sys
 sys.path.append('/home/vivek.gupta/maxlife')
 
 import tensorflow as tf
-from tensorflow.contrib import rnn
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile, calculate_gini_score_manual, calculate_precision_recall_curve, \
@@ -31,7 +30,7 @@ lstm_test_path = sys.argv[5]
 
 learning_rate = 0.001
 keep_probability = 0.7
-epochs = 25
+epochs = 1000
 batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
@@ -45,7 +44,7 @@ ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
                    "TB_POL_RIDER_COUNT_5", "TB_POL_RIDER_COUNT_null",
                    "TB_POL_RIDER_COUNT_6", "TB_POL_RIDER_COUNT_7",
                    "TPP_POL_PPT_0_0", "TPP_POL_PPT_1_0",
-                   "TPP_POL_PPT_2_0", "TPP_POL_PPT_3_0",
+                   "TPP_POL_PPT_2_0", "TPP_POL_PPT_3_0", "TPP_POL_PPT_3_NULL"
                    "AGENT_EDUCATION_null", "AGENT_EDUCATION_Post Graduation",
                    "AGENT_EDUCATION_Under Graduation",
                    "AGENT_EDUCATION_Doctorate",
@@ -122,21 +121,58 @@ ignore_col_list = ["POL_ID", "DATA_MONTH", "TPP_POL_MED_NONMED_MED",
                    "TB_POL_CSTAT_CD_PERC",
                    "TB_POL_CSTAT_CD_C"]
 
+ignore_col_list_ffn = ["POL_ID", "DATA_MONTH", "DUE_DATE"]
+                       # "CLI_INCOME_TODAY"]
+                   # "TB_POL_CSTAT_CD_PCRU",
+                   # "TB_POL_CSTAT_CD_5",
+                   # "TB_POL_CSTAT_CD_4",
+                   # "TB_POL_CSTAT_CD_1A",
+                   # "TB_POL_CSTAT_CD_PECC",
+                   # "TB_POL_CSTAT_CD_PCCU",
+                   # "TB_POL_CSTAT_CD_PCRC",
+                   # "TB_POL_CSTAT_CD_2",
+                   # "TB_POL_CSTAT_CD_M",
+                   # "TB_POL_CSTAT_CD_B",
+                   # "TB_POL_CSTAT_CD_D",
+                   # "TB_POL_CSTAT_CD_PERU",
+                   # "TB_POL_CSTAT_CD_Y",
+                   # "TB_POL_CSTAT_CD_1",
+                   # "TB_POL_CSTAT_CD_R",
+                   # "TB_POL_CSTAT_CD_A",
+                   # "TB_POL_CSTAT_CD_3",
+                   # "TB_POL_CSTAT_CD_E",
+                   # "TB_POL_CSTAT_CD_PERC",
+                   # "TB_POL_CSTAT_CD_C",
+                   # "TPP_INSURED_MARITAL_STS_Others",
+                   # "TPP_INSURED_MARITAL_STS_Married",
+                   # "TPP_INSURED_MARITAL_STS_Single",
+                   # "TPP_INSURED_GENDER_FEMALE",
+                   # "TPP_INSURED_GENDER_MALE",
+                   # "TPP_INSURED_GENDER_null",
+                   # "TPP_INSURED_INDUSTRY_missing",
+                   # "TPP_INSURED_INDUSTRY_high",
+                   # "TPP_INSURED_INDUSTRY_medium",
+                   # "TPP_INSURED_INDUSTRY_low",
+                   # "TPP_INSURED_INDUSTRY_others",
+                   # "TPP_INSURED_EDU_(A)Illiterate",
+                   # "TPP_INSURED_EDU_(D)Others",
+                   # "TPP_INSURED_EDU_(C)Grad & above",
+                   # "TPP_INSURED_EDU_(B)Schooling", "TPP_INSURED_INCOME"]
+
+ignore_col_list_lstm = ["POL_ID", "DATA_MONTH"]
+
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
-                                                       ignore_cols=ignore_col_list, output_label="Lapse_Flag")
+                                                       ignore_cols=ignore_col_list_ffn, output_label="Lapse_Flag")
 lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
-                                          ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
+                                          ignore_cols=ignore_col_list_lstm,
                                           output_label="Lapse_Flag")
-# lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
 
 ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True,
-                                                     ignore_cols=ignore_col_list, output_label="Lapse_Flag")
+                                                     ignore_cols=ignore_col_list_ffn, output_label="Lapse_Flag")
 lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True,
-                                         ignore_cols=["POL_ID", "DATA_MONTH", "MODE_PAYMENT"],
+                                         ignore_cols=ignore_col_list_lstm,
                                          output_label="Lapse_Flag")
-# lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH"], output_label="Lapse_Flag")
-
 print("ffn data")
 print(ffn_train_data[0])
 print(len(ffn_train_data[0]))
