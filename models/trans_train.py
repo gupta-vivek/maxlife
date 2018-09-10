@@ -33,9 +33,11 @@ display_count = 1000
 split_ratio = [100, 0, 0]
 keep_probability = 0.5
 
+ignore_col_list_lstm = ["POL_ID", "DATA_MONTH"]
+
 print("Reading the data...")
-trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
-trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=["POL_ID", "DATA_MONTH", "TB_POL_BILL_MODE_CD", "MI"], output_label="Lapse_Flag")
+trans_train_data, trans_train_label, _, _, _, _ = read_csv(trans_train_path, split_ratio=split_ratio, header=True, ignore_cols=ignore_col_list_lstm, output_label="Lapse_Flag")
+trans_test_data, trans_test_label, _, _, _, _ = read_csv(trans_test_path, split_ratio=split_ratio, header=True, ignore_cols=ignore_col_list_lstm, output_label="Lapse_Flag")
 
 print(trans_train_data[0])
 print(trans_train_label[0])
@@ -58,8 +60,8 @@ test_batch_size = len(test_y)
 
 # Placeholders.
 with tf.name_scope("placeholders"):
-    x = tf.placeholder(dtype=tf.float32, shape=[None, 24], name="input")
-    y = tf.placeholder(dtype=tf.float32, shape=[None, 1], name="output")
+    x = tf.placeholder(dtype=tf.float32, shape=[None, len(trans_train_data[0])], name="input")
+    y = tf.placeholder(dtype=tf.float32, shape=[None, len(trans_train_label[0])], name="output")
     z = tf.placeholder(dtype=tf.float32, shape=[], name="z")
     lr = tf.placeholder(dtype=tf.float32, shape=[], name="lr")
     kp = tf.placeholder(dtype=tf.float32, shape=[], name="kp")
@@ -68,20 +70,20 @@ with tf.name_scope("placeholders"):
 # Model.
 def model(x, kp):
     with tf.name_scope("transaction"):
-        reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, 24, 1])
+        reshape_trans_data = tf.reshape(x, name="reshape_trans", shape=[-1, len(trans_train_data[0]), 1])
         unstack_trans_data = tf.unstack(reshape_trans_data, name="unstack_trans", axis=1)
 
-        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=50, activation=tf.nn.relu)
+        lstm_cell = rnn.BasicLSTMCell(name="trans_lstm", num_units=10, activation=tf.nn.relu)
         trans_lstm, states = rnn.static_rnn(lstm_cell, unstack_trans_data, dtype=tf.float32)
 
         trans_weights = {
-            'w_h1': tf.get_variable(name="w_h1", shape=[50, 50], initializer=tf.contrib.layers.xavier_initializer()),
+            'w_h1': tf.get_variable(name="w_h1", shape=[10, 10], initializer=tf.contrib.layers.xavier_initializer()),
             # 'w_h2': tf.get_variable(name="w_h2", shape=[50, 25], initializer=tf.contrib.layers.xavier_initializer()),
-            'w_out': tf.get_variable(name="w_out", shape=[50, 1], initializer=tf.contrib.layers.xavier_initializer())
+            'w_out': tf.get_variable(name="w_out", shape=[10, 1], initializer=tf.contrib.layers.xavier_initializer())
         }
 
         trans_bias = {
-            'b_h1':  tf.get_variable(name="b_h1", shape=[50], initializer=tf.contrib.layers.xavier_initializer()),
+            'b_h1':  tf.get_variable(name="b_h1", shape=[10], initializer=tf.contrib.layers.xavier_initializer()),
             # 'b_h2': tf.get_variable(name="b_h2", shape=[25], initializer=tf.contrib.layers.xavier_initializer()),
             'b_out':  tf.get_variable(name="b_out", shape=[1], initializer=tf.contrib.layers.xavier_initializer())
         }
