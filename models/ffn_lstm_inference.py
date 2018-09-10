@@ -14,7 +14,7 @@ sys.path.append('/home/vivek.gupta/maxlife')
 import tensorflow as tf
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 from utils.data_utils import calculate_decile, calculate_gini_score_manual, calculate_precision_recall_curve, \
-    calculate_confusion_matrix, sigmoid
+    calculate_confusion_matrix, sigmoid, Find_Optimal_Cutoff
 import numpy as np
 import os
 import pandas as pd
@@ -268,11 +268,13 @@ with tf.device("/GPU:0"):
         df['POL_ID'] = temp_df['POL_ID']
         df['DATA_MONTH'] = temp_df['DATA_MONTH']
 
-        y_pred = sigmoid(train_predictions)
-        y_pred[np.where(y_pred >= 0.5)] = 1.0
-        y_pred[np.where(y_pred < 0.5)] = 0.0
-        df['Predictions'] = y_pred
+        # y_pred = sigmoid(train_predictions)
+        # y_pred[np.where(y_pred >= 0.5)] = 1.0
+        # y_pred[np.where(y_pred < 0.5)] = 0.0
+        # df['Predictions'] = y_pred
         df['Raw_Output'] = sigmoid(train_predictions)
+        thrshold = Find_Optimal_Cutoff(ffn_train_label, df['Raw_Output'].values)[0]
+        df['Predicted_Flag'] = df.apply(lambda row: 1 if row['Raw_Output'] > thrshold else 0, axis=1)
         # df['Label'] = ffn_train_label
 
         df.sort_values(by=['Raw_Output'], ascending=[False], inplace=True)
