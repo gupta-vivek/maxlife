@@ -149,8 +149,19 @@ def stratified_generator(trans_path, train_ratio, test_ratio, output_dir):
     print(test_df.head())
 
 
-def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_dir):
-    trans_df = pd.read_csv(trans_path)
+def stratified_generator2(ffn_path, lstm_path, train_ratio, test_ratio, output_dir):
+    ffn_filename = ffn_path.split('/')[-1]
+    ffn_filename = ffn_filename.split('.')[0]
+    ffn_train_filename = ffn_filename + "_train.csv"
+    ffn_test_filename = ffn_filename + "_test.csv"
+
+    lstm_filename = lstm_path.split('/')[-1]
+    lstm_filename = lstm_filename.split('.')[0]
+    lstm_train_filename = lstm_filename + "_train.csv"
+    lstm_test_filename = lstm_filename + "_test.csv"
+
+
+    trans_df = pd.read_csv(lstm_path)
     trans_df_Y = trans_df[['Lapse_Flag']]
     trans_df_X = trans_df.drop(['Lapse_Flag'], axis=1)
 
@@ -181,12 +192,12 @@ def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_
     train_trans_df = trans_df.reindex(idx)
     train_ffn_df = ffn_df.reindex(idx)
 
-    train_trans_df.to_csv(output_dir + "yearly_lstm_train2.csv", index=False)
+    train_trans_df.to_csv(output_dir + lstm_train_filename, index=False)
     print(train_trans_df.head())
     print(len(train_trans_df))
-	
+
     print("FFN")
-    train_ffn_df.to_csv(output_dir + "yearly_ffn_train2.csv", index=False)
+    train_ffn_df.to_csv(output_dir + ffn_train_filename, index=False)
     print(train_ffn_df.head())
     print(len(train_ffn_df))
     print("Test")
@@ -197,11 +208,11 @@ def stratified_generator2(ffn_path, trans_path, train_ratio, test_ratio, output_
     test_trans_df = trans_df.reindex(idx)
     test_ffn_df = ffn_df.reindex(idx)
 
-    test_trans_df.to_csv(output_dir + "yearly_lstm_test2.csv", index=False)
+    test_trans_df.to_csv(output_dir + lstm_test_filename, index=False)
     print(test_trans_df.head())
     print(len(test_trans_df))
     print("FFN")
-    test_ffn_df.to_csv(output_dir + "yearly_ffn_test2.csv", index=False)
+    test_ffn_df.to_csv(output_dir + ffn_test_filename, index=False)
     print(test_ffn_df.head())
     print(len(test_ffn_df))
 
