@@ -243,16 +243,14 @@ with tf.device("/GPU:0"):
         train_predictions = train_predictions.reshape(train_predictions.shape[0], )
 
         train_gini = calculate_gini_score_manual(ffn_train_label, train_predictions)
-        precision, recall, threshold = calculate_precision_recall_curve(ffn_train_label, train_predictions)
+        # precision, recall, threshold = calculate_precision_recall_curve(ffn_train_label, train_predictions)
         #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, threshold)
 
-        print("Decile")
-        print("Test: ", train_decile_score)
-        print("Gini")
-        print("Test: ", train_gini)
-        print("\nPrecision: ", precision)
-        print("Recall: ", recall)
-        print("Threshold: ", threshold)
+        print("Decile: ", train_decile_score)
+        print("Gini: ", train_gini)
+        # print("\nPrecision: ", precision)
+        # print("Recall: ", recall)
+        # print("Threshold: ", threshold)
 
         temp_df = pd.read_csv(lstm_train_path)
         df = pd.DataFrame()
@@ -265,8 +263,9 @@ with tf.device("/GPU:0"):
         # df['Predictions'] = y_pred
         df['Raw_Output'] = sigmoid(train_predictions)
         thrshold = Find_Optimal_Cutoff(ffn_train_label, df['Raw_Output'].values)[0]
-        print("Optimal Threshold - ", threshold)
+        print("Optimal Threshold - ", thrshold)
         con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, thrshold)
+        print("Confusion Matrix")
         df['Predicted_Flag'] = df.apply(lambda row: 1 if row['Raw_Output'] >= thrshold else 0, axis=1)
         # df['Label'] = ffn_train_label
 
