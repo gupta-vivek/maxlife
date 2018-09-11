@@ -266,6 +266,7 @@ with tf.device("/GPU:0"):
         print("Optimal Threshold - ", thrshold)
         con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, thrshold)
         print("Confusion Matrix")
+        print(con_mat)
         df['Predicted_Flag'] = df.apply(lambda row: 1 if row['Raw_Output'] >= thrshold else 0, axis=1)
         # df['Label'] = ffn_train_label
 
