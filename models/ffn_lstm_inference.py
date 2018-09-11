@@ -236,7 +236,7 @@ with tf.device("/GPU:0"):
 
         train_predictions = [item for sublist in train_predictions for item in sublist]
 
-        train_decile_score = calculate_decile(train_predictions, list(ffn_train_label))
+        train_decile_score = calculate_decile(train_predictions, list(ffn_train_label), decile_distribution=True)
 
         ffn_train_label = ffn_train_label.reshape(ffn_train_label.shape[0], )
         train_predictions = np.asarray(train_predictions)
