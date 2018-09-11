@@ -77,7 +77,7 @@ def calculate_gini_score_manual(y_true, y_pred):
     return g_pred / g_true
 
 
-def calculate_decile(predictions, labels):
+def calculate_decile(predictions, labels, decile_distribution=False):
     sum_ones = np.count_nonzero(labels)
     sum_zeroes = len(labels) - sum_ones
 
@@ -124,7 +124,10 @@ def calculate_decile(predictions, labels):
         x = length_predictions_10
         length_predictions_10 += length_predictions_10_x
 
-    #print(decile_dict)
+    if decile_distribution:
+        print("Decile Distribution")
+        print(decile_dict)
+
     dec_score = 0
     count = 0
     for k in decile_dict.keys():

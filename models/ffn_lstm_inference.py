@@ -18,6 +18,7 @@ from utils.data_utils import calculate_decile, calculate_gini_score_manual, calc
 import numpy as np
 import os
 import pandas as pd
+import math
 
 model_name = sys.argv[1]
 ffn_train_path = sys.argv[2]
@@ -252,17 +253,7 @@ with tf.device("/GPU:0"):
         print("\nPrecision: ", precision)
         print("Recall: ", recall)
         print("Threshold: ", threshold)
-        #print("\nConfustion Matrix")
 
-       # for t in threshold[:1]:
-            #print("thresh: ", t)
-            #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, t)
-            #print(con_mat)
-            #print("\n")
-
-        #print('Default threshold - 0.5')
-        #con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, 0.5)
-        #print(con_mat)
         temp_df = pd.read_csv(lstm_train_path)
         df = pd.DataFrame()
         df['POL_ID'] = temp_df['POL_ID']
@@ -274,13 +265,14 @@ with tf.device("/GPU:0"):
         # df['Predictions'] = y_pred
         df['Raw_Output'] = sigmoid(train_predictions)
         thrshold = Find_Optimal_Cutoff(ffn_train_label, df['Raw_Output'].values)[0]
-        df['Predicted_Flag'] = df.apply(lambda row: 1 if row['Raw_Output'] > thrshold else 0, axis=1)
+        print("Optimal Threshold - ", threshold)
+        con_mat = calculate_confusion_matrix(ffn_train_label, train_predictions, thrshold)
+        df['Predicted_Flag'] = df.apply(lambda row: 1 if row['Raw_Output'] >= thrshold else 0, axis=1)
         # df['Label'] = ffn_train_label
 
         df.sort_values(by=['Raw_Output'], ascending=[False], inplace=True)
-
         len_df = len(df)
-        len_10 = round(len_df / 10)
+        len_10 = math.floor(len_df / 10)
         len_10_x = len_10
 
         x = 0
