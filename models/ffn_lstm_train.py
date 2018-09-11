@@ -16,7 +16,7 @@ from tensorflow.contrib import rnn
 from utils.file_utils import read_csv, divide_batches, divide_batches_gen
 import datetime
 from utils.data_utils import calculate_decile, calculate_gini_score_manual, calculate_precision_recall_curve, \
-    calculate_confusion_matrix
+    calculate_confusion_matrix, Find_Optimal_Cutoff, sigmoid
 import numpy as np
 import os
 
@@ -28,9 +28,9 @@ ffn_test_path = sys.argv[3]
 lstm_train_path = sys.argv[4]
 lstm_test_path = sys.argv[5]
 
-learning_rate = 0.0001
+learning_rate = 0.001
 keep_probability = 0.7
-epochs = 200
+epochs = 1000
 batch_size = 512
 display_count = 1000
 split_ratio = [100, 0, 0]
@@ -438,15 +438,19 @@ with tf.device("/GPU:0"):
             print("Threshold: ", threshold)
             print("\nConfustion Matrix")
 
-            for t in threshold[:1]:
-                print("thresh: ", t)
-                con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, t)
-                print(con_mat)
-                print("\n")
+            # for t in threshold[:1]:
+            #     print("thresh: ", t)
+            #     con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, t)
+            #     print(con_mat)
+            #     print("\n")
 
-            print('Default threshold - 0.5')
-            con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, 0.5)
+            sig_test_predictions = sigmoid(test_predictions)
+            thrshold = Find_Optimal_Cutoff(ffn_test_label, sig_test_predictions)[0]
+            print("Optimal Threshold - ", thrshold)
+            con_mat = calculate_confusion_matrix(ffn_test_label, test_predictions, thrshold)
+            print("Confusion Matrix")
             print(con_mat)
+            print("\n\n")
 
             z_temp = sess.run(train_avg_loss_summ, feed_dict={z: train_loss / train_batch_size})
             writer.add_summary(z_temp, i)
