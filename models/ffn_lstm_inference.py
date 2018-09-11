@@ -272,7 +272,7 @@ with tf.device("/GPU:0"):
 
         df.sort_values(by=['Raw_Output'], ascending=[False], inplace=True)
         len_df = len(df)
-        len_10 = math.floor(len_df / 10)
+        len_10 = math.ceil(len_df / 10)
         len_10_x = len_10
 
         x = 0
