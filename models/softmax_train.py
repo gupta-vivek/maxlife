@@ -40,16 +40,15 @@ ignore_col_list_lstm = ["POL_ID", "DATA_MONTH"]
 
 print("Reading the data...")
 ffn_train_data, ffn_train_label, _, _, _, _ = read_csv(ffn_train_path, split_ratio=split_ratio, header=True,
-                                                       ignore_cols=ignore_col_list_ffn, output_label=label_list,
-                                                       label_vector=True)
+                                                       ignore_cols=ignore_col_list_ffn, output_label=label_list)
 
 lstm_train_data, _, _, _, _, _ = read_csv(lstm_train_path, split_ratio=split_ratio, header=True,
                                           ignore_cols=ignore_col_list_lstm,
                                           output_label="Lapse_Flag")
 
 ffn_test_data, ffn_test_label, _, _, _, _ = read_csv(ffn_test_path, split_ratio=split_ratio, header=True,
-                                                     ignore_cols=ignore_col_list_ffn, output_label=label_list,
-                                                     label_vector=True)
+                                                     ignore_cols=ignore_col_list_ffn, output_label=label_list)
+
 
 lstm_test_data, _, _, _, _, _ = read_csv(lstm_test_path, split_ratio=split_ratio, header=True,
                                          ignore_cols=ignore_col_list_lstm,
