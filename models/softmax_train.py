@@ -149,6 +149,7 @@ def model(x_ffn, x_lstm, kp):
 
 
 y_ = model(x_ffn, x_lstm, kp)
+y_softmax = tf.nn.softmax(y_)
 tf.add_to_collection("y_", y_)
 
 # Loss.
@@ -260,19 +261,19 @@ with tf.device("/GPU:0"):
             # Calculate decile.
             train_predictions = []
             for train_data_ffn, train_data_lstm in zip(train_ffn_x, train_lstm_x):
-                model_prediction = sess.run(y_, feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, kp: 1.0})
+                model_prediction = sess.run(y_softmax, feed_dict={x_ffn: train_data_ffn, x_lstm: train_data_lstm, kp: 1.0})
                 train_predictions.append(temp for temp in model_prediction)
 
             test_predictions = []
             for test_data_ffn, test_data_lstm in zip(test_ffn_x, test_lstm_x):
-                model_prediction = sess.run(y_, feed_dict={x_ffn: test_data_ffn, x_lstm: test_data_lstm, kp: 1.0})
+                model_prediction = sess.run(y_softmax, feed_dict={x_ffn: test_data_ffn, x_lstm: test_data_lstm, kp: 1.0})
                 test_predictions.append(temp for temp in model_prediction)
 
             train_predictions = [item for sublist in train_predictions for item in sublist]
             test_predictions = [item for sublist in test_predictions for item in sublist]
 
-            train_decile_score = calculate_decile_softmax(train_predictions, list(ffn_train_label))
-            test_decile_score = calculate_decile_softmax(test_predictions, list(ffn_test_label))
+            train_decile_score = calculate_decile_softmax(train_predictions, ffn_train_label)
+            test_decile_score = calculate_decile_softmax(test_predictions, ffn_test_label)
 
             print("Loss")
             print("Train: ", train_loss / train_batch_size)
