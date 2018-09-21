@@ -153,7 +153,7 @@ tf.add_to_collection("y_", y_)
 
 # Loss.
 with tf.name_scope("loss"):
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_, targets=y))
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_, labels=y))
     tf.add_to_collection("loss", loss)
 
 # Optimizer.
