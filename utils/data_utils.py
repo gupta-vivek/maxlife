@@ -33,8 +33,8 @@ def Find_Optimal_Cutoff(target, predicted):
     """
     fpr, tpr, threshold = roc_curve(target, predicted)
     i = np.arange(len(tpr))
-    roc = pd.DataFrame({'tf' : pd.Series(tpr-(1-fpr), index=i), 'threshold' : pd.Series(threshold, index=i)})
-    roc_t = roc.ix[(roc.tf-0).abs().argsort()[:1]]
+    roc = pd.DataFrame({'tf': pd.Series(tpr - (1 - fpr), index=i), 'threshold': pd.Series(threshold, index=i)})
+    roc_t = roc.ix[(roc.tf - 0).abs().argsort()[:1]]
 
     return list(roc_t['threshold'])
 
@@ -92,7 +92,74 @@ def calculate_decile(predictions, labels, decile_distribution=False):
     df = df.sort_values(by=['Predictions'], ascending=False)
 
     length_predictions = len(preds_sig)
-    length_predictions_10 = int(length_predictions/10)
+    length_predictions_10 = int(length_predictions / 10)
+    length_predictions_10_x = length_predictions_10
+
+    for i in reversed(range(10)):
+        decile_dict[str(i)] = {}
+        decile_dict[str(i)]['zero'] = 0
+        decile_dict[str(i)]['one'] = 0
+
+    x = 0
+    for i in reversed(range(10)):
+        temp_df = df[x:length_predictions_10]
+        sum_of_one = np.count_nonzero(temp_df['Label'])
+        sum_of_zero = length_predictions_10_x - sum_of_one
+        decile_dict[str(i)]['zero'] = sum_of_zero
+        decile_dict[str(i)]['one'] = sum_of_one
+
+        if sum_of_one == 0:
+            percentage_ones = 0
+        else:
+            percentage_ones = decile_dict[str(i)]['one'] / sum_ones * 100
+
+        if sum_of_zero == 0:
+            percentage_zeroes = 0
+        else:
+            percentage_zeroes = decile_dict[str(i)]['zero'] / sum_zeroes * 100
+
+        decile_dict[str(i)]['percentage_ones'] = percentage_ones
+        decile_dict[str(i)]['percentage_zeroes'] = percentage_zeroes
+
+        x = length_predictions_10
+        length_predictions_10 += length_predictions_10_x
+
+    if decile_distribution:
+        print("Decile Distribution")
+        print(decile_dict)
+
+    dec_score = 0
+    count = 0
+    for k in decile_dict.keys():
+        count += 1
+        if count <= 3:
+            dec_score += decile_dict[k]['percentage_ones']
+        else:
+            break
+    return dec_score
+
+
+def calculate_decile_softmax(predictions, labels, decile_distribution=False):
+    labels = np.logical_not(labels[:, -1]).astype(int)
+    print(labels)
+    sum_ones = np.count_nonzero(labels)
+    sum_zeroes = labels.shape[0] - sum_ones
+
+    decile_dict = OrderedDict()
+
+    df = pd.DataFrame()
+    new_prediction = np.max(predictions[:,:3], axis=1)
+    print(new_prediction)
+
+    df['Label'] = labels
+    # preds_sig = sigmoid(predictions)
+    preds_sig = new_prediction
+
+    df['Predictions'] = preds_sig
+    df = df.sort_values(by=['Predictions'], ascending=False)
+
+    length_predictions = preds_sig.shape[0]
+    length_predictions_10 = int(length_predictions / 10)
     length_predictions_10_x = length_predictions_10
 
     for i in reversed(range(10)):
@@ -184,7 +251,6 @@ def stratified_generator2(ffn_path, lstm_path, train_ratio, test_ratio, output_d
     lstm_filename = lstm_filename.split('.')[0]
     lstm_train_filename = lstm_filename + "_train.csv"
     lstm_test_filename = lstm_filename + "_test.csv"
-
 
     trans_df = pd.read_csv(lstm_path)
     trans_df_Y = trans_df[['Lapse_Flag']]
@@ -316,4 +382,9 @@ def month_mode_split(ffn_path, lstm_path, output_dir):
 
 
 if __name__ == "__main__":
-    stratified_generator2("~/yearly_ffn2.csv", "~/yearly_lstm2.csv", train_ratio=0.6, test_ratio=0.4, output_dir="~/")
+    # stratified_generator2("~/yearly_ffn2.csv", "~/yearly_lstm2.csv", train_ratio=0.6, test_ratio=0.4, output_dir="~/")
+
+    a = np.asarray([[0.1, 0.2, 0.3, 0.4], [0.5, 0.1, 0.2, 0.2], [0.5, 0.1, 0.2, 0.2]])
+    b = np.asarray([[0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]])
+    # print(b.shape)
+    print(calculate_decile_softmax(a, b))
